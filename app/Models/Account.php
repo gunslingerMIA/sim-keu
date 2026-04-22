@@ -18,5 +18,10 @@ class Account extends Model
                 $table->timestamps();
         });
     }
+
+    public function budgets()
+    {
+        return $this->hasMany(Budget::class);
+    }
    
 }

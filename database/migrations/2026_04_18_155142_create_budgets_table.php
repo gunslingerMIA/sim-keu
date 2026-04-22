@@ -15,14 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sub_activity_id')->constrained();
             $table->foreignId('account_id')->constrained();
+            $table->double('nominal', 15, 2);
             
-            // Nilai Anggaran
-            $table->decimal('amount', 15, 2); 
+            // Tahapan: murni, geser_awal, perubahan, geser_akhir
+            $table->string('tahapan'); 
             
-            // Penanda Versi: murni, pergeseran_1, pergeseran_2, perubahan
-            $table->string('version')->default('murni'); 
+            // Untuk melacak ini pergeseran ke berapa (misal: Geser 1, Geser 2)
+            $table->integer('versi')->default(1); 
             
-            $table->year('fiscal_year');
+            $table->string('dasar_hukum')->nullable(); // No. Perkada atau SK
+            $table->year('tahun');
             $table->timestamps();
         });
     }

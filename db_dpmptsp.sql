@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 21, 2026 at 10:22 AM
+-- Generation Time: Apr 22, 2026 at 10:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,14 @@ CREATE TABLE `accounts` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `accounts`
+--
+
+INSERT INTO `accounts` (`id`, `kode_rekening`, `nama_rekening`, `kelompok`, `created_at`, `updated_at`) VALUES
+(5, 'A002', 'Panjar Didik Didik', 'panjar', '2026-04-21 21:40:50', '2026-04-21 23:19:39'),
+(6, 'A003', 'Panjar Dea', 'panjar', '2026-04-21 21:41:17', '2026-04-21 21:41:17');
 
 -- --------------------------------------------------------
 
@@ -72,6 +80,28 @@ INSERT INTO `activities` (`id`, `program_id`, `kode_kegiatan`, `nama_kegiatan`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `app_settings`
+--
+
+CREATE TABLE `app_settings` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `app_settings`
+--
+
+INSERT INTO `app_settings` (`id`, `key`, `value`, `label`, `created_at`, `updated_at`) VALUES
+(1, 'tahapan_aktif', 'murni', 'APBD Murni', '2026-04-22 00:36:25', '2026-04-22 00:36:25');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `budgets`
 --
 
@@ -79,9 +109,11 @@ CREATE TABLE `budgets` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `sub_activity_id` bigint(20) UNSIGNED NOT NULL,
   `account_id` bigint(20) UNSIGNED NOT NULL,
-  `amount` decimal(15,2) NOT NULL,
-  `version` varchar(255) NOT NULL DEFAULT 'murni',
-  `fiscal_year` year(4) NOT NULL,
+  `nominal` double NOT NULL,
+  `tahapan` varchar(255) NOT NULL,
+  `versi` int(11) NOT NULL DEFAULT 1,
+  `dasar_hukum` varchar(255) DEFAULT NULL,
+  `tahun` year(4) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -183,8 +215,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (3, '0001_01_01_000002_create_jobs_table', 1),
 (4, '2026_04_18_152959_create_budget_plans_table', 1),
 (5, '2026_04_18_154941_create_accounts_table', 2),
-(13, '2026_04_18_155142_create_budgets_table', 3),
-(14, '2026_04_18_155322_create_transactions_table', 3);
+(15, '2026_04_18_155142_create_budgets_table', 3),
+(16, '2026_04_18_155322_create_transactions_table', 3),
+(17, '2026_04_22_073049_create_app_settings_table', 4);
 
 -- --------------------------------------------------------
 
@@ -244,7 +277,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('Zzm6rNkOPmXt1bdQElcovnBZ6idqfWaakbyrE5dJ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidmo5Rk1OU0VNNFNLZ0t1ZjE4N1JNb3NwRkdYU2FXVG15amtIbk84aiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9fQ==', 1776757397);
+('9n27LPOr7aTuFvOmPs6LJAwwKxDzOW30UUSao6oG', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiekVsRTZVMHFoeFp2VEdOYzNHS3dqZGxoMUFBTGNiMlRjY0lXSG1qbSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9idWRnZXRzPzE9IjtzOjU6InJvdXRlIjtzOjEzOiJidWRnZXRzLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1776845232);
 
 -- --------------------------------------------------------
 
@@ -362,6 +395,13 @@ ALTER TABLE `activities`
   ADD KEY `activities_program_id_foreign` (`program_id`);
 
 --
+-- Indexes for table `app_settings`
+--
+ALTER TABLE `app_settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `app_settings_key_unique` (`key`);
+
+--
 -- Indexes for table `budgets`
 --
 ALTER TABLE `budgets`
@@ -461,13 +501,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `activities`
 --
 ALTER TABLE `activities`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `app_settings`
+--
+ALTER TABLE `app_settings`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `budgets`
@@ -491,13 +537,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `programs`
 --
 ALTER TABLE `programs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `sub_activities`

@@ -27,5 +27,10 @@ class Activity extends Model
         return $this->hasMany(SubActivity::class);
     }
 
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
+    }
+
     
 }

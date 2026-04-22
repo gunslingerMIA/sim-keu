@@ -5,11 +5,14 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\MasterProgramController;
+use App\Http\Controllers\BudgetController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/accounts', [AccountController::class, 'index'])->name('account.index');
-Route::post('/accounts', [AccountController::class, 'store'])->name('account.store');
+Route::post('/accounts/store', [AccountController::class, 'store'])->name('account.store');
+Route::put('/accounts/update/{id}', [AccountController::class, 'update'])->name('account.update');
+Route::get('accounts/delete/{id}', [AccountController::class, 'delete'])->name('account.delete');
 
 Route::prefix('programs')->group(function () {
     Route::get('/', [MasterProgramController::class, 'index'])->name('programs.index');
@@ -22,7 +25,13 @@ Route::prefix('programs')->group(function () {
     Route::put('/kegiatan/update/{id}', [MasterProgramController::class, 'updateKegiatan']);
     Route::post('/subkegiatan/store', [MasterProgramController::class, 'storeSubActivities']);
     Route::put('/subkegiatan/update/{id}', [MasterProgramController::class, 'updateSubActivities']);
-        });
+});
+
+Route::prefix('budgets')->group(function () {
+    Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
+    Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
+    Route::post('/replicate', [BudgetController::class, 'replicate'])->name('budgets.replicate');
+});
 
 // Rute untuk menampilkan halaman Form Input
 Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');

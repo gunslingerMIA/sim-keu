@@ -20,5 +20,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        // Mengambil value dari key 'tahapan_aktif'
+        $setting = \App\Models\AppSetting::where('key', 'tahapan_aktif')->first();
+        
+        // Share ke semua view
+        view()->share('tahapanAktif', $setting->value ?? 'murni');
+        view()->share('labelTahapan', $setting->label ?? 'APBD Murni');
     }
 }

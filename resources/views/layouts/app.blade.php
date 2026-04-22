@@ -86,7 +86,7 @@
             </div>
 
             <div class="mt-2 flex-grow-1">
-                <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="/dashboard">
+                <a class="nav-link {{ request()->is('dashboard') || request()->is('/') ? 'active' : '' }}" href="/dashboard">
                     <i class="bi bi-grid-1x2-fill"></i> Dashboard
                 </a>
 
@@ -96,6 +96,9 @@
                 </a>
                 <a href="/accounts" class="nav-link {{ request()->is('accounts') ? 'active' : '' }}">
                     <i class="bi bi-collection"></i> Akun
+                </a>
+                <a href="/budgets" class="nav-link {{ request()->is('budgets') ? 'active' : '' }}">
+                    <i class="bi bi-collection"></i> DPA
                 </a>
 
                 <div class="menu-header">Transaksi</div>
@@ -176,6 +179,37 @@
                 if (window.innerWidth < 1200) toggleSidebar();
             });
         });
+
+        
+    </script>
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // Notifikasi jika Sukses
+        @if(session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: "{{ session('success') }}"
+            });
+        @endif
+
+        // Notifikasi jika Error (Pesan Manual)
+        @if(session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: "{{ session('error') }}"
+            });
+        @endif
     </script>
 </body>
 </html>

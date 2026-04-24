@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 22, 2026 at 10:12 AM
+-- Generation Time: Apr 24, 2026 at 06:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,8 +41,7 @@ CREATE TABLE `accounts` (
 --
 
 INSERT INTO `accounts` (`id`, `kode_rekening`, `nama_rekening`, `kelompok`, `created_at`, `updated_at`) VALUES
-(5, 'A002', 'Panjar Didik Didik', 'panjar', '2026-04-21 21:40:50', '2026-04-21 23:19:39'),
-(6, 'A003', 'Panjar Dea', 'panjar', '2026-04-21 21:41:17', '2026-04-21 21:41:17');
+(1, 'A002', 'Panjar Didik', 'panjar', '2026-04-23 20:31:49', '2026-04-23 20:31:49');
 
 -- --------------------------------------------------------
 
@@ -64,18 +63,18 @@ CREATE TABLE `activities` (
 --
 
 INSERT INTO `activities` (`id`, `program_id`, `kode_kegiatan`, `nama_kegiatan`, `created_at`, `updated_at`) VALUES
-(1, 1, '2.18.01.2.01', 'Perencanaan, Penganggaran, dan Evaluasi Kinerja Perangkat Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(2, 1, '2.18.01.2.02', 'Administrasi Keuangan Perangkat Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(3, 1, '2.18.01.2.05', 'Administrasi Kepegawaian Perangkat Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(4, 1, '2.18.01.2.06', 'Administrasi Umum Perangkat Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(5, 1, '2.18.01.2.08', 'Penyediaan Jasa Penunjang Urusan Pemerintahan Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(6, 1, '2.18.01.2.09', 'Pemeliharaan Barang Milik Daerah Penunjang Urusan Pemerintahan Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(7, 2, '2.18.02.2.01', 'Penetapan Pemberian Fasilitas/Insentif', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(8, 2, '2.18.02.2.02', 'Pembuatan Peta Potensi Investasi', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(9, 3, '2.18.03.2.01', 'Penyelenggaraan Promosi Penanaman Modal yang Menjadi Kewenangan Daerah Kabupaten/Kota', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(10, 4, '2.18.04.2.01', 'Pelayanan Perizinan dan Non Perizinan Secara Terpadu Satu Pintu dibidang Penanaman Modal yang Menjadi Kewenangan Daerah Kabupaten/ Kota', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(11, 5, '2.18.05.2.01', 'Pengendalian Pelaksanaan Penanaman Modal yang Menjadi Kewenangan Daerah Kabupaten/Kota', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(12, 6, '2.18.06.2.01', 'Pengelolaan Data dan Informasi Perizinan dan Non Perizinan yang Terintegrasi pada Tingkat Daerah Kabupaten/Kota', '2026-04-18 16:29:07', '2026-04-18 16:29:07');
+(1, 1, '2.18.01.2.01', 'Perencanaan, Penganggaran, dan Evaluasi Kinerja Perangkat Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(2, 1, '2.18.01.2.02', 'Administrasi Keuangan Perangkat Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(3, 1, '2.18.01.2.05', 'Administrasi Kepegawaian Perangkat Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(4, 1, '2.18.01.2.06', 'Administrasi Umum Perangkat Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(5, 1, '2.18.01.2.08', 'Penyediaan Jasa Penunjang Urusan Pemerintahan Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(6, 1, '2.18.01.2.09', 'Pemeliharaan Barang Milik Daerah Penunjang Urusan Pemerintahan Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(7, 2, '2.18.02.2.01', 'Penetapan Pemberian Fasilitas/Insentif', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(8, 2, '2.18.02.2.02', 'Pembuatan Peta Potensi Investasi', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(9, 3, '2.18.03.2.01', 'Penyelenggaraan Promosi Penanaman Modal yang Menjadi Kewenangan Daerah Kabupaten/Kota', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(10, 4, '2.18.04.2.01', 'Pelayanan Perizinan dan Non Perizinan Secara Terpadu Satu Pintu dibidang Penanaman Modal yang Menjadi Kewenangan Daerah Kabupaten/ Kota', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(11, 5, '2.18.05.2.01', 'Pengendalian Pelaksanaan Penanaman Modal yang Menjadi Kewenangan Daerah Kabupaten/Kota', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(12, 6, '2.18.06.2.01', 'Pengelolaan Data dan Informasi Perizinan dan Non Perizinan yang Terintegrasi pada Tingkat Daerah Kabupaten/Kota', '2026-04-23 19:04:07', '2026-04-23 19:04:07');
 
 -- --------------------------------------------------------
 
@@ -91,13 +90,6 @@ CREATE TABLE `app_settings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `app_settings`
---
-
-INSERT INTO `app_settings` (`id`, `key`, `value`, `label`, `created_at`, `updated_at`) VALUES
-(1, 'tahapan_aktif', 'murni', 'APBD Murni', '2026-04-22 00:36:25', '2026-04-22 00:36:25');
 
 -- --------------------------------------------------------
 
@@ -214,10 +206,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (2, '0001_01_01_000001_create_cache_table', 1),
 (3, '0001_01_01_000002_create_jobs_table', 1),
 (4, '2026_04_18_152959_create_budget_plans_table', 1),
-(5, '2026_04_18_154941_create_accounts_table', 2),
-(15, '2026_04_18_155142_create_budgets_table', 3),
-(16, '2026_04_18_155322_create_transactions_table', 3),
-(17, '2026_04_22_073049_create_app_settings_table', 4);
+(5, '2026_04_18_154941_create_accounts_table', 1),
+(6, '2026_04_18_155142_create_budgets_table', 1),
+(7, '2026_04_18_155322_create_transactions_table', 1),
+(8, '2026_04_22_073049_create_app_settings_table', 1);
 
 -- --------------------------------------------------------
 
@@ -250,12 +242,12 @@ CREATE TABLE `programs` (
 --
 
 INSERT INTO `programs` (`id`, `kode_program`, `nama_program`, `created_at`, `updated_at`) VALUES
-(1, '2.18.01', 'PROGRAM PENUNJANG URUSAN PEMERINTAHAN DAERAH KABUPATEN/KOTA', '2026-04-18 16:29:07', '2026-04-19 10:19:42'),
-(2, '2.18.02', 'PROGRAM PENGEMBANGAN IKLIM PENANAMAN MODAL', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(3, '2.18.03', 'PROGRAM PROMOSI PENANAMAN MODAL', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(4, '2.18.04', 'PROGRAM PELAYANAN PENANAMAN MODAL', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(5, '2.18.05', 'PROGRAM PENGENDALIAN PELAKSANAAN PENANAMAN MODAL', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(6, '2.18.06', 'PROGRAM PENGELOLAAN DATA DAN SISTEM INFORMASI PENANAMAN MODAL', '2026-04-18 16:29:07', '2026-04-18 16:29:07');
+(1, '2.18.01', 'PROGRAM PENUNJANG URUSAN PEMERINTAHAN DAERAH KABUPATEN/KOTA', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(2, '2.18.02', 'PROGRAM PENGEMBANGAN IKLIM PENANAMAN MODAL', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(3, '2.18.03', 'PROGRAM PROMOSI PENANAMAN MODAL', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(4, '2.18.04', 'PROGRAM PELAYANAN PENANAMAN MODAL', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(5, '2.18.05', 'PROGRAM PENGENDALIAN PELAKSANAAN PENANAMAN MODAL', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(6, '2.18.06', 'PROGRAM PENGELOLAAN DATA DAN SISTEM INFORMASI PENANAMAN MODAL', '2026-04-23 19:04:07', '2026-04-23 19:04:07');
 
 -- --------------------------------------------------------
 
@@ -277,7 +269,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('9n27LPOr7aTuFvOmPs6LJAwwKxDzOW30UUSao6oG', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiekVsRTZVMHFoeFp2VEdOYzNHS3dqZGxoMUFBTGNiMlRjY0lXSG1qbSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9idWRnZXRzPzE9IjtzOjU6InJvdXRlIjtzOjEzOiJidWRnZXRzLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1776845232);
+('qwXvDHVStNtT7lPpHefJXJgpjcNxIbIpmWyHEyhn', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVEt0OW1TUkhpMGNaUVUwS3EwOVNBcUZKOWdsNE9vRTVtZlUwb2pDdSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC91c2VycyI7czo1OiJyb3V0ZSI7czoxMToidXNlcnMuaW5kZXgiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1777003394);
 
 -- --------------------------------------------------------
 
@@ -299,37 +291,37 @@ CREATE TABLE `sub_activities` (
 --
 
 INSERT INTO `sub_activities` (`id`, `activity_id`, `kode_sub_kegiatan`, `nama_sub_kegiatan`, `created_at`, `updated_at`) VALUES
-(1, 1, '2.18.01.2.01.0001', 'Penyusunan Dokumen Perencanaan Perangkat Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(2, 1, '2.18.01.2.01.0002', 'Koordinasi dan Penyusunan Dokumen RKA-SKPD', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(3, 1, '2.18.01.2.01.0007', 'Evaluasi Kinerja Perangkat Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(4, 2, '2.18.01.2.02.0001', 'Penyediaan Gaji dan Tunjangan ASN', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(5, 2, '2.18.01.2.02.0003', 'Pelaksanaan Penatausahaan dan Pengujian/Verifikasi Keuangan SKPD', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(6, 2, '2.18.01.2.02.0005', 'Koordinasi dan Penyusunan Laporan Keuangan Akhir Tahun SKPD', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(7, 3, '2.18.01.2.05.0002', 'Pengadaan Pakaian Dinas beserta Atribut Kelengkapannya', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(8, 4, '2.18.01.2.06.0001', 'Penyediaan Komponen Instalasi Listrik/Penerangan Bangunan Kantor', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(9, 4, '2.18.01.2.06.0002', 'Penyediaan Peralatan dan Perlengkapan Kantor', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(10, 4, '2.18.01.2.06.0003', 'Penyediaan Peralatan Rumah Tangga', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(11, 4, '2.18.01.2.06.0004', 'Penyediaan Bahan Logistik Kantor', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(12, 4, '2.18.01.2.06.0005', 'Penyediaan Barang Cetakan dan Penggandaan', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(13, 4, '2.18.01.2.06.0006', 'Penyediaan Bahan Bacaan dan Peraturan Perundang-undangan', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(14, 4, '2.18.01.2.06.0009', 'Penyelenggaraan Rapat Koordinasi dan Konsultasi SKPD', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(15, 5, '2.18.01.2.08.0001', 'Penyediaan Jasa Surat Menyurat', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(16, 5, '2.18.01.2.08.0002', 'Penyediaan Jasa Komunikasi, Sumber Daya Air dan Listrik', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(17, 5, '2.18.01.2.08.0004', 'Penyediaan Jasa Pelayanan Umum Kantor', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(18, 6, '2.18.01.2.09.0001', 'Penyediaan Jasa Pemeliharaan, Biaya Pemeliharaan, dan Pajak Kendaraan', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(19, 6, '2.18.01.2.09.0009', 'Pemeliharaan/Rehabilitasi Gedung Kantor', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(20, 6, '2.18.01.2.09.0010', 'Pemeliharaan/Rehabilitasi Sarana dan Prasarana Gedung', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(21, 7, '2.18.02.2.01.0004', 'Rekomendasi kebijakan sektor usaha', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(22, 8, '2.18.02.2.02.0004', 'Penyusunan Peta Potensi Investasi', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(23, 9, '2.18.03.2.01.0002', 'Pelaksanaan Kegiatan Promosi Penanaman Modal Daerah Kabupaten/Kota', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(24, 10, '2.18.04.2.01.0005', 'Koordinasi dan Sinkronisasi Penetapan Pemberian Fasilitas/Insentif Daerah', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(25, 10, '2.18.04.2.01.0006', 'KPenyediaan Pelayanan Perizinan Berusaha melalui Sistem Perizinan Berusaha Berbasis Risiko Terintegrasi secara Elektronik', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(26, 10, '2.18.04.2.01.0007', 'Penyediaan dan pengelolaan Layanan konsultasi perizinan berusaha berbasis risiko', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(27, 10, '2.18.04.2.01.0008', 'Pemantauan, analisis, evaluasi, dan pelaporan di bidang perizinan berusaha berbasis risiko', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(28, 11, '2.18.05.2.01.0004', 'Penyelesaian Permasalahan dan Hambatan yang dihadapi Pelaku Usaha dalam merealisasikan Kegiatan Usahanya', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(29, 11, '2.18.05.2.01.0005', 'Bimbingan Teknis kepada Pelaku Usaha', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(30, 11, '2.18.05.2.01.0006', 'Pengawasan Penanaman Modal', '2026-04-18 16:29:07', '2026-04-18 16:29:07'),
-(31, 12, '2.18.06.2.01.0002', 'Pengolahan, Penyajian dan Pemanfaatan Data dan Informasi Perizinan Berbasis Sistem Pelayanan Perizinan Berusaha Terintegrasi secara Elektronik', '2026-04-18 16:29:07', '2026-04-18 16:29:07');
+(1, 1, '2.18.01.2.01.0001', 'Penyusunan Dokumen Perencanaan Perangkat Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(2, 1, '2.18.01.2.01.0002', 'Koordinasi dan Penyusunan Dokumen RKA-SKPD', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(3, 1, '2.18.01.2.01.0007', 'Evaluasi Kinerja Perangkat Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(4, 2, '2.18.01.2.02.0001', 'Penyediaan Gaji dan Tunjangan ASN', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(5, 2, '2.18.01.2.02.0003', 'Pelaksanaan Penatausahaan dan Pengujian/Verifikasi Keuangan SKPD', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(6, 2, '2.18.01.2.02.0005', 'Koordinasi dan Penyusunan Laporan Keuangan Akhir Tahun SKPD', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(7, 3, '2.18.01.2.05.0002', 'Pengadaan Pakaian Dinas beserta Atribut Kelengkapannya', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(8, 4, '2.18.01.2.06.0001', 'Penyediaan Komponen Instalasi Listrik/Penerangan Bangunan Kantor', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(9, 4, '2.18.01.2.06.0002', 'Penyediaan Peralatan dan Perlengkapan Kantor', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(10, 4, '2.18.01.2.06.0003', 'Penyediaan Peralatan Rumah Tangga', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(11, 4, '2.18.01.2.06.0004', 'Penyediaan Bahan Logistik Kantor', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(12, 4, '2.18.01.2.06.0005', 'Penyediaan Barang Cetakan dan Penggandaan', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(13, 4, '2.18.01.2.06.0006', 'Penyediaan Bahan Bacaan dan Peraturan Perundang-undangan', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(14, 4, '2.18.01.2.06.0009', 'Penyelenggaraan Rapat Koordinasi dan Konsultasi SKPD', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(15, 5, '2.18.01.2.08.0001', 'Penyediaan Jasa Surat Menyurat', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(16, 5, '2.18.01.2.08.0002', 'Penyediaan Jasa Komunikasi, Sumber Daya Air dan Listrik', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(17, 5, '2.18.01.2.08.0004', 'Penyediaan Jasa Pelayanan Umum Kantor', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(18, 6, '2.18.01.2.09.0001', 'Penyediaan Jasa Pemeliharaan, Biaya Pemeliharaan, dan Pajak Kendaraan', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(19, 6, '2.18.01.2.09.0009', 'Pemeliharaan/Rehabilitasi Gedung Kantor', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(20, 6, '2.18.01.2.09.0010', 'Pemeliharaan/Rehabilitasi Sarana dan Prasarana Gedung', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(21, 7, '2.18.02.2.01.0004', 'Rekomendasi kebijakan sektor usaha', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(22, 8, '2.18.02.2.02.0004', 'Penyusunan Peta Potensi Investasi', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(23, 9, '2.18.03.2.01.0002', 'Pelaksanaan Kegiatan Promosi Penanaman Modal Daerah Kabupaten/Kota', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(24, 10, '2.18.04.2.01.0005', 'Koordinasi dan Sinkronisasi Penetapan Pemberian Fasilitas/Insentif Daerah', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(25, 10, '2.18.04.2.01.0006', 'KPenyediaan Pelayanan Perizinan Berusaha melalui Sistem Perizinan Berusaha Berbasis Risiko Terintegrasi secara Elektronik', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(26, 10, '2.18.04.2.01.0007', 'Penyediaan dan pengelolaan Layanan konsultasi perizinan berusaha berbasis risiko', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(27, 10, '2.18.04.2.01.0008', 'Pemantauan, analisis, evaluasi, dan pelaporan di bidang perizinan berusaha berbasis risiko', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(28, 11, '2.18.05.2.01.0004', 'Penyelesaian Permasalahan dan Hambatan yang dihadapi Pelaku Usaha dalam merealisasikan Kegiatan Usahanya', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(29, 11, '2.18.05.2.01.0005', 'Bimbingan Teknis kepada Pelaku Usaha', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(30, 11, '2.18.05.2.01.0006', 'Pengawasan Penanaman Modal', '2026-04-23 19:04:07', '2026-04-23 19:04:07'),
+(31, 12, '2.18.06.2.01.0002', 'Pengolahan, Penyajian dan Pemanfaatan Data dan Informasi Perizinan Berbasis Sistem Pelayanan Perizinan Berusaha Terintegrasi secara Elektronik', '2026-04-23 19:04:07', '2026-04-23 19:04:07');
 
 -- --------------------------------------------------------
 
@@ -360,10 +352,10 @@ CREATE TABLE `transactions` (
 CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `nip` varchar(255) NOT NULL,
+  `jabatan` varchar(255) DEFAULT NULL,
+  `role` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -372,8 +364,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Test User', 'test@example.com', '2026-04-18 08:45:53', '$2y$12$Q1/1HIQNdNH64rMWqglqbe4WID.anehC7U7TBXTx1Qrx/qOV4lbGu', '0jnVk4Gq4W', '2026-04-18 08:45:53', '2026-04-18 08:45:53');
+INSERT INTO `users` (`id`, `name`, `nip`, `jabatan`, `role`, `password`, `created_at`, `updated_at`) VALUES
+(1, 'Didik Yogo Suro Prasojo, S.Kom', '199801092022031007', 'Pranata Komputer ahli Pertama', 'Admin', 'dpmptsp', NULL, NULL),
+(2, 'TES', '199801092022031001', 'Tes', 'Bendahara', '$2y$12$zKTUdzFSm4L2Sq2BuLV/ZOg/wK6OeU81KWGDm1AbO9tHsslqppLca', '2026-04-23 19:52:01', '2026-04-23 19:52:01'),
+(3, 'tes2', '199801092022031002', 'tes2', 'Aendahara', '$2y$12$2XQykEuvHf/9a67/zLbQt.n2KuKOhNlvKHi8NYp9suMeaKcZUQe4O', '2026-04-23 19:52:18', '2026-04-23 19:52:18');
 
 --
 -- Indexes for dumped tables
@@ -384,7 +378,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 --
 ALTER TABLE `accounts`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `accounts_code_unique` (`kode_rekening`);
+  ADD UNIQUE KEY `accounts_kode_rekening_unique` (`kode_rekening`);
 
 --
 -- Indexes for table `activities`
@@ -491,7 +485,7 @@ ALTER TABLE `transactions`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_email_unique` (`email`);
+  ADD UNIQUE KEY `users_nip_unique` (`nip`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -501,19 +495,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `activities`
 --
 ALTER TABLE `activities`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `app_settings`
 --
 ALTER TABLE `app_settings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `budgets`
@@ -537,19 +531,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `programs`
 --
 ALTER TABLE `programs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `sub_activities`
 --
 ALTER TABLE `sub_activities`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `transactions`
@@ -561,7 +555,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

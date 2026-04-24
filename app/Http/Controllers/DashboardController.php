@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $tahun = session('tahun_anggaran', 2026);
 
         // 1. Hitung Total Pagu dari tabel budgets
-        $totalPagu = \App\Models\Budget::where('fiscal_year', $tahun)->sum('amount');
+        $totalPagu = \App\Models\Budget::where('tahun', $tahun)->sum('nominal');
 
         // 2. Hitung Total Realisasi dari tabel transactions (Akun Tipe Belanja)
         $totalRealisasi = \App\Models\Transaction::whereYear('date', $tahun)

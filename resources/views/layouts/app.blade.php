@@ -100,6 +100,9 @@
                 <a href="/budgets" class="nav-link {{ request()->is('budgets') ? 'active' : '' }}">
                     <i class="bi bi-collection"></i> DPA
                 </a>
+                <a href="/users" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
+                    <i class="bi bi-collection"></i> User
+                </a>
 
                 <div class="menu-header">Transaksi</div>
                 <a class="nav-link {{ request()->is('transactions') ? 'active' : '' }}" href="/transactions">
@@ -153,7 +156,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
+    @stack('sciprts')
     <script>
         // DataTables Init
         $(function() {
@@ -210,6 +213,17 @@
                 title: "{{ session('error') }}"
             });
         @endif
+
+        
     </script>
+    {{-- @if ($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Ada kesalahan pada inputan Anda!'
+            });
+        </script>
+        @endif --}}
 </body>
 </html>

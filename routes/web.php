@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\MasterProgramController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -25,6 +26,11 @@ Route::prefix('programs')->group(function () {
     Route::put('/kegiatan/update/{id}', [MasterProgramController::class, 'updateKegiatan']);
     Route::post('/subkegiatan/store', [MasterProgramController::class, 'storeSubActivities']);
     Route::put('/subkegiatan/update/{id}', [MasterProgramController::class, 'updateSubActivities']);
+});
+
+Route::prefix('users')->group(function(){
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::post('/store', [UserController::class, 'store'])->name('users.store');
 });
 
 Route::prefix('budgets')->group(function () {

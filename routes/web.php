@@ -24,17 +24,38 @@ Route::middleware('auth')->group(function () {
     Route::get('accounts/delete/{id}', [AccountController::class, 'delete'])->name('account.delete');
 
     Route::prefix('programs')->group(function () {
-    Route::get('/', [MasterProgramController::class, 'index'])->name('programs.index');
-    Route::post('/store', [MasterProgramController::class, 'storeProgram'])->name('programs.store');
-    Route::put('/update/{id}', [MasterProgramController::class, 'updateProgram']);
-    Route::get('/delete/{id}', [MasterProgramController::class, 'deleteProgram']);
-    Route::get('/kegiatan/delete/{id}', [MasterProgramController::class, 'deleteActivity']);
-    Route::get('/sub/delete/{id}', [MasterProgramController::class, 'deleteSubActivity']);
-    Route::post('/kegiatan/store', [MasterProgramController::class, 'storeKegiatan']);
-    Route::put('/kegiatan/update/{id}', [MasterProgramController::class, 'updateKegiatan']);
-    Route::post('/subkegiatan/store', [MasterProgramController::class, 'storeSubActivities']);
-    Route::put('/subkegiatan/update/{id}', [MasterProgramController::class, 'updateSubActivities']);
-});
+        Route::get('/', [MasterProgramController::class, 'index'])->name('programs.index');
+        Route::post('/store', [MasterProgramController::class, 'storeProgram'])->name('programs.store');
+        Route::put('/update/{id}', [MasterProgramController::class, 'updateProgram']);
+        Route::get('/delete/{id}', [MasterProgramController::class, 'deleteProgram']);
+        Route::get('/kegiatan/delete/{id}', [MasterProgramController::class, 'deleteActivity']);
+        Route::get('/sub/delete/{id}', [MasterProgramController::class, 'deleteSubActivity']);
+        Route::post('/kegiatan/store', [MasterProgramController::class, 'storeKegiatan']);
+        Route::put('/kegiatan/update/{id}', [MasterProgramController::class, 'updateKegiatan']);
+        Route::post('/subkegiatan/store', [MasterProgramController::class, 'storeSubActivities']);
+        Route::put('/subkegiatan/update/{id}', [MasterProgramController::class, 'updateSubActivities']);
+
+        
+    });
+
+    Route::prefix('budgets')->group(function () {
+        Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
+        Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
+        Route::post('/replicate', [BudgetController::class, 'replicate'])->name('budgets.replicate');
+        // Route::post('/ganti-tahapan', [BudgetController::class, 'gantiTahapan'])->name('budgets.ganti-tahapan');
+        Route::get('/rinci/{sub_id}', [BudgetController::class, 'rincian'])->name('budgets.rinci');
+        Route::get('/delete/{id}', [BudgetController::class, 'delete'])->name('budgets.delete');
+    });
+
+    Route::prefix('transactions')->group(function (){
+        Route::get('/', [TransactionController::class, 'index'])->name('transactions.index');
+        // Rute untuk menampilkan halaman Form Input
+        Route::get('/add', [TransactionController::class, 'add'])->name('transactions.add');
+
+        // Rute untuk memproses data yang dikirim dari Form (Method POST)
+        Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    });
+
 });
 
 
@@ -49,20 +70,7 @@ Route::prefix('users')->group(function(){
     Route::put('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.reset-password');
 });
 
-Route::prefix('budgets')->group(function () {
-    Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
-    Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
-    Route::post('/replicate', [BudgetController::class, 'replicate'])->name('budgets.replicate');
-    // Route::post('/ganti-tahapan', [BudgetController::class, 'gantiTahapan'])->name('budgets.ganti-tahapan');
-    Route::get('/rinci/{sub_id}', [BudgetController::class, 'rincian'])->name('budgets.rinci');
-    Route::get('/delete/{id}', [BudgetController::class, 'delete'])->name('budgets.delete');
-});
 
-// Rute untuk menampilkan halaman Form Input
-Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
-
-// Rute untuk memproses data yang dikirim dari Form (Method POST)
-Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 
 // Rute untuk AJAX (Dependent Dropdown)
 Route::get('/get-activities/{programId}', [TransactionController::class, 'getActivities']);

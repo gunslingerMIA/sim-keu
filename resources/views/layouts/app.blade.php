@@ -154,8 +154,15 @@
                     <i class="bi bi-bank text-white"></i>
                 </div>
                 <h6 class="text-white fw-bold mb-0">SIM-KEU DPMPTSP</h6>
-                <small class="text-muted">TA {{ session('tahun_anggaran', '2026') }}</small>
+                <small class="text-muted">TA {{ session('tahun_anggaran') }}</small><br>
+                <div class="btn-list text-center d-flex justify-content-center mt-2">
+                    <span class="badge bg-green-lt fw-bold border border-green">
+                        <i class="bi bi-layers-fill me-1"></i>
+                        {{ session('nama_tahapan', 'BELUM DIATUR') }}
+                    </span>
+                </div>
             </div>
+                
 
             <div class="mt-2 flex-grow-1">
                 <a class="nav-link {{ request()->is('dashboard') || request()->is('/') ? 'active' : '' }}"

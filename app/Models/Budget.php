@@ -13,7 +13,8 @@ class Budget extends Model
         'sub_activity_id',
         'account_id',
         'nominal',
-        'tahun'
+        'tahun',
+        'stage_id'
     ];
     //
     

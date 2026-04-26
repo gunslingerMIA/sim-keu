@@ -6,7 +6,9 @@
             <div class="row align-items-center">
                 <div class="col">
                     <h2 class="page-title">Dashboard Anggaran {{ $tahun }}</h2>
-                    <div class="text-muted small mt-1">Monitoring Pagu dan Realisasi DPA Perangkat Daerah</div>
+                    <div class="subheader text-azure">
+                        Ringkasan Realisasi Anggaran (Tahap: {{ session('nama_tahapan') }})
+                    </div>
                 </div>
             </div>
         </div>

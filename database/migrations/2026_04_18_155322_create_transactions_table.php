@@ -24,6 +24,7 @@ return new class extends Migration
             // Relasi ke Sub-Kegiatan (Kosong jika transaksi non-belanja)
             $table->foreignId('sub_activity_id')->nullable()->constrained();
             
+            
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('credit', 15, 2)->default(0);
             $table->timestamps();

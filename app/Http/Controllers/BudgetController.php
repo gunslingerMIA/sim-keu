@@ -7,6 +7,7 @@ use App\Models\SubActivity;
 use App\Models\Account;
 use App\Models\Program;
 use App\Models\AppSetting;
+use App\Models\Stage;
 use Illuminate\Http\Request;
 
 class BudgetController extends Controller
@@ -42,36 +43,42 @@ class BudgetController extends Controller
 
     public function index()
     {
-       $tahun = session('tahun_anggaran', date('Y'));
+        $tahun = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
 
-    // Ambil Program -> Kegiatan -> SubKegiatan + Sum Nominal dari tabel budgets
-    $programs = Program::where('tahun', $tahun)
-        ->with([
-            'activities' => function($q) use ($tahun) {
-                $q->with([
-                    'subActivities' => function($sq) use ($tahun) {
-                        // Hitung total pagu di level Sub Kegiatan
-                        $sq->withSum(['budgets as total_pagu' => function($bq) use ($tahun) {
-                            $bq->where('tahun', $tahun);
-                        }], 'nominal');
-                    }
-                ]);
-            }
-        ])
-        ->get()
-        ->map(function ($program) {
-            // Hitung total pagu level Kegiatan (Sum dari anak-anaknya)
-            foreach ($program->activities as $activity) {
-                $activity->total_pagu = $activity->subActivities->sum('total_pagu');
-            }
-            
-            // Hitung total pagu level Program (Sum dari kegiatannya)
-            $program->total_pagu = $program->activities->sum('total_pagu');
-            
-            return $program;
-        });
+        // Jika tahapan kosong, redirect ke pilih tahun atau beri peringatan
+        if (!$tahapan) {
+            return redirect()->route('tahun.pilih')->with('error', 'Silakan pilih tahun dan tahapan terlebih dahulu.');
+        }
 
-    return view('budgets.index', compact('programs'));
+        $programs = Program::where('tahun', $tahun)
+            // Opsi: Jika Program juga punya stage_id, tambahkan where di sini
+            ->with([
+                'activities' => function($q) use ($tahun, $tahapan) {
+                    $q->with([
+                        'subActivities' => function($sq) use ($tahun, $tahapan) {
+                            // Gunakan withSum dengan kondisi yang ketat
+                            $sq->withSum(['budgets as total_pagu' => function($bq) use ($tahun, $tahapan) {
+                                $bq->where('tahun', $tahun)
+                                ->where('stage_id', $tahapan);
+                            }], 'nominal');
+                        }
+                    ]);
+                }
+            ])
+            ->get()
+            ->map(function ($program) {
+                foreach ($program->activities as $activity) {
+                    // Pastikan nilai default 0 jika sum bernilai null
+                    $activity->total_pagu = $activity->subActivities->sum('total_pagu') ?? 0;
+                }
+                
+                $program->total_pagu = $program->activities->sum('total_pagu') ?? 0;
+                
+                return $program;
+            });
+
+        return view('budgets.index', compact('programs'));
     }
 
     public function rincian($sub_id)
@@ -97,10 +104,19 @@ class BudgetController extends Controller
         ]);
 
         $tahun = session('tahun_anggaran', date('Y'));
+        $stage_id = session('active_stage_id');
+
+        if (!$stage_id) {
+            $stage_id = \App\Models\Stage::where('tahun', $tahun)->where('is_active', true)->first()?->id;  
+            if (!$stage_id) {
+                return back()->with('error', 'Silakan pilih tahapan terlebih dahulu.');
+            }
+        }
 
         // Gunakan updateOrCreate untuk mencegah duplikasi rekening di sub kegiatan yang sama
         Budget::updateOrCreate(
             [
+                'stage_id'       => $stage_id,
                 'tahun'           => $tahun,
                 'sub_activity_id' => $request->sub_activity_id,
                 'account_id'      => $request->account_id

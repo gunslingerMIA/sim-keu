@@ -7,7 +7,7 @@
             <div>
                 <h2 class="page-title text-primary">Struktur DPA SKPD</h2>
                 <small class="text-success fw-bold">
-                    <i class="bi bi-calendar3 me-1"></i> Tahun Anggaran: {{ session('tahun_anggaran') }}
+                    <i class="bi bi-calendar3 me-1"></i> Tahun Anggaran: {{ session('tahun_anggaran') }} {{ session('nama_tahapan') }}
                 </small>
             </div>
             <div class="text-end">

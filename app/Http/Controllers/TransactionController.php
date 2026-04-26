@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Models\Transaction;
 
 class TransactionController extends Controller
 {
@@ -11,68 +13,62 @@ class TransactionController extends Controller
 
     // app/Http/Controllers/TransactionController.php
 
-    public function create()
+    public function index()
     {
-        // Mengambil data untuk dropdown
-        $programs = \App\Models\Program::all();
-        
-        // Akun debet (Belanja & Panjar)
-        $accounts = \App\Models\Account::whereIn('type', ['belanja', 'panjar'])->get();
-        
-        // Akun kredit (Kas Bendahara / Bank)
-        $cashAccounts = \App\Models\Account::where('type', 'kas')->get();
+        $tahun = session('tahun_anggaran');
 
-        return view('transactions.create', compact('programs', 'accounts', 'cashAccounts'));
+        $transactions = Transaction::with(['account', 'subActivity'])
+            ->whereYear('date', $tahun)
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('transactions.index', compact('transactions', 'tahun'));
     }
 
-    public function store(Request $request) 
+    public function add()
     {
+        return view('transactions.create');
+    }
 
+    public function store(Request $request)
+    {
         $request->validate([
             'date' => 'required|date',
-            'description' => 'required|string|max:255',
-            'debit_account' => 'required|exists:accounts,id',
-            'credit_account' => 'required|exists:accounts,id',
+            'sub_activity_id' => 'required',
+            'account_id' => 'required',
             'amount' => 'required|numeric|min:1',
+            'description' => 'required',
+            'evidence_number' => 'required',
         ]);
 
-        // Generate ID unik untuk kelompok transaksi ini
-        $batchId = 'TRX-' . time(); 
+        $batchId = Str::uuid(); // Generate batch_id unik untuk setiap transaksi baru
 
-        // 1. Catat Baris DEBIT (Akun Belanja/Panjar)
-        Transaction::create([
+        //input debit
+        Transasction::create([
             'batch_id' => $batchId,
             'date' => $request->date,
-            'evidence_number' => $request->evidence_number,
             'description' => $request->description,
-            'account_id' => $request->debit_account, // Akun yang didebet
+            'account_id' => $request->account_id,
             'sub_activity_id' => $request->sub_activity_id,
             'debit' => $request->amount,
-            'credit' => 0
+            'credit' => 0,
+            'evidence_number' => $request->evidence_number
         ]);
 
-        // 2. Catat Baris KREDIT (Akun Kas/Bendahara)
+        //input kredit (jika ada)
         Transaction::create([
             'batch_id' => $batchId,
             'date' => $request->date,
-            'evidence_number' => $request->evidence_number,
             'description' => $request->description,
-            'account_id' => $request->credit_account, // Akun yang dikredit
-            'sub_activity_id' => null, // Kas biasanya tidak nempel ke sub-kegiatan
+            'account_id' => $request->account_id, // Ganti dengan akun lawan jika diperlukan
+            'sub_activity_id' => $request->sub_activity_id, // Ganti dengan sub kegiatan lawan jika diperlukan
             'debit' => 0,
-            'credit' => $request->amount
-        ]);
+            'credit' => $request->amount,
+            'evidence_number' => $request->evidence_number
+        ]); 
 
-        return redirect()->back()->with('success', 'Transaksi Berhasil Dicatat!');
-    }
-
-   public function getActivities($programId) {
-        $activities = \App\Models\Activity::where('program_id', $programId)->get();
-        return response()->json($activities); // WAJIB ada response()->json()
-    }
-
-    public function getSubActivities($activityId) {
-        $subActivities = \App\Models\SubActivity::where('activity_id', $activityId)->get();
-        return response()->json($subActivities);
+        return back()->with('success', 'Transaksi berhasil disimpan!');
+        
     }
 }

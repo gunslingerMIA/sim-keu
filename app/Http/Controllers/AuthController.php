@@ -49,6 +49,21 @@ class AuthController extends Controller
         ]);
         session(['tahun_anggaran' => $request->tahun]);
 
+        // 2. CARI TAHAPAN AKTIF DI TAHUN TERSEBUT
+        // Kita cari yang is_active-nya true khusus untuk tahun yang dipilih
+        $activeStage = \App\Models\Stage::where('tahun', $request->tahun)
+                                        ->where('is_active', true)
+                                        ->first();
+        if ($activeStage) {
+            session([
+                'active_stage_id' => $activeStage->id,
+                'nama_tahapan'    => $activeStage->nama_tahapan,
+            ]);
+        } else {
+            // Opsi jika belum ada tahapan yang diaktifkan admin
+            session()->forget(['active_stage_id', 'nama_tahapan']);
+        }
+
         return redirect()->route('dashboard');
     }
 

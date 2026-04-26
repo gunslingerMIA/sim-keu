@@ -27,11 +27,11 @@
                         @foreach ($users as $user)
                             <tr>
                                 <td>
-                                    <button class="btn btn-sm btn-primary" title="Edit"><i
+                                    <button class="btn btn-sm btn-primary" title="Edit" data-bs-toggle="modal" data-bs-target="#modal-user" onclick="fillModalUser({{ json_encode($user) }})"><i
                                             class="bi bi-pencil"></i></button>
-                                    <button class="btn btn-sm btn-warning" title="Reset Password"><i
+                                    <button class="btn btn-sm btn-warning" title="Reset Password" onclick="resetPassword('{{ $user->id }}')"><i
                                             class="bi bi-lock"></i></button>
-                                    <button class="btn btn-sm btn-danger" title="Hapus"><i
+                                    <button class="btn btn-sm btn-danger" title="Hapus" onclick="confirmDelete('/users/delete/{{ $user->id }}')"><i
                                             class="bi bi-trash"></i></button>
                                 </td>
                                 <td>{{ $user->nip }}</td>
@@ -64,7 +64,7 @@
                         <div class="mb-3">
                             <label class="form-label">NIP</label>
                             <input type="text" name="nip" id="nip"
-                                class="form-control  @error('nip') is-invalid @enderror"" placeholder="199xxxxxxxxxxxxx"
+                                class="form-control  @error('nip') is-invalid @enderror" placeholder="199xxxxxxxxxxxxx"
                                 required>
                             @error('nip')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -84,8 +84,8 @@
                             <label class="form-label">Role</label>
                             <select name="role" id="role" class="form-control">
                                 <option value="Bendahara">Bendahara</option>
-                                <option value="Aendahara">Admin</option>
-                                <option value="Kendahara">Kasir</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Bendahara">Kasir</option>
                             </select>
                         </div>
                     </div>
@@ -100,35 +100,88 @@
 
     @push('scripts')
         <script>
+            function fillModalUser(data = null) {
+                const form = document.getElementById('form-akun');
+                const title = document.getElementById('modal-title');
+                const methodField = document.getElementById('method-field');
+
+                if (data) {
+                    title.innerText = 'Edit User';
+                    form.action = '/users/update/' + data.id;
+                    methodField.innerHTML = '@method('PUT')';
+
+                    document.getElementById('nip').value = data.nip;
+                    document.getElementById('nama_user').value = data.name;
+                    document.getElementById('jabatan').value = data.jabatan;
+                    document.getElementById('role').value = data.role;
+                } else {
+                    title.innerText = 'Tambah User Baru';
+                    form.action = '/users/store';
+                    methodField.innerHTML = '@method('POST')';
+                    form.reset();
+                }
+            }
+        
             // Script ini akan otomatis ditaruh di bawah tabler.min.js
             @if($errors->any())
-            console.log('eror');
                 var myModal = new bootstrap.Modal(document.getElementById('modal-user'));
+                @if(old('_method') == 'PUT')
+                    // Jika sebelumnya sedang edit, jangan di-reset ke 'Tambah'
+                    // Kita isi manual action-nya karena data.id hilang setelah redirect
+                    document.getElementById('modal-title').innerText = 'Edit User';
+                    document.getElementById('form-user').action = '{{ url("users/update") }}/' + '{{ old("id") }}';
+                    document.getElementById('method-field').innerHTML = '@method("PUT")';
+                @else
+                    fillModalUser(); // Default ke Tambah
+                @endif
                 myModal.show();
+              
             @endif
         </script>
     @endpush
+
     <script>
-        function fillModalUser(data = null) {
-            const form = document.getElementById('form-akun');
-            const title = document.getElementById('modal-title');
-            const methodField = document.getElementById('method-field');
+        function confirmDelete(url) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang sudah dihapus tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
 
-            if (data) {
-                title.innerText = 'Edit User';
-                form.action = '/users/update/' + data.id;
-                methodField.innerHTML = '@method('PUT')';
+        function resetPassword(id) {
+            Swal.fire({
+                title: 'Reset Password?',
+                text: "Password akan direset ke default!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var form = $('<form>', {
+                        action: '/users/reset-password/' + id,
+                        method: 'POST'
+                    });
 
-                document.getElementById('nip').value = data.nip;
-                document.getElementById('nama_user').value = data.name;
-                document.getElementById('jabatan').value = data.jabatan;
-                document.getElementById('role').value = data.role;
-            } else {
-                title.innerText = 'Tambah User Baru';
-                form.action = '/users/store';
-                methodField.innerHTML = '';
-                form.reset();
-            }
+                    form.append('@csrf');
+                    form.append('@method("PUT")');
+                    
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
         }
     </script>
     

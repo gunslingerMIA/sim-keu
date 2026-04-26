@@ -18,7 +18,7 @@ return new class extends Migration
             $table->double('nominal', 15, 2);
             
             // Tahapan: murni, geser_awal, perubahan, geser_akhir
-            $table->string('tahapan'); 
+            $table->foreignId('stage_id')->constrained(); 
             
             // Untuk melacak ini pergeseran ke berapa (misal: Geser 1, Geser 2)
             $table->integer('versi')->default(1); 

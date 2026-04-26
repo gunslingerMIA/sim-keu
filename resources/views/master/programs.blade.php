@@ -3,13 +3,24 @@
 @section('content')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Jika ada error validasi di session
         @if($errors->any())
-            // Tentukan modal mana yang harus dibuka (tambah atau edit)
-            // Kita cek jika ada data 'old' untuk menentukan konteksnya
+            let modalId = '';
             const isEdit = "{{ old('_method') }}" === "PUT";
-            const modalId = isEdit ? 'modal-edit-program' : 'modal-program';
+
+            // 1. Cek apakah ini konteks KEGIATAN
+            @if($errors->has('kode_kegiatan') || old('program_id'))
+                modalId = isEdit ? 'modal-edit-kegiatan' : 'modal-kegiatan';
             
+            // 2. Cek apakah ini konteks SUB KEGIATAN
+            @elseif($errors->has('kode_sub_kegiatan') || old('activity_id'))
+                modalId = isEdit ? 'modal-edit-sub-kegiatan' : 'modal-sub-kegiatan';
+            
+            // 3. Default ke PROGRAM
+            @else
+                modalId = isEdit ? 'modal-edit-program' : 'modal-program';
+            @endif
+
+            // Eksekusi buka modal
             const modalEl = document.getElementById(modalId);
             if (modalEl && window.bootstrap) {
                 const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -148,7 +159,10 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Kode Program</label>
-                        <input type="text" name="kode_program" class="form-control" placeholder="Contoh: 2.18.01" required>
+                        <input type="text" name="kode_program"  class="form-control @error('kode_program') is-invalid @enderror" placeholder="Contoh: 2.18.01" required>
+                        @error('kode_program')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Nama Program</label>
@@ -205,7 +219,7 @@
         <div class="modal-content">
             <form action="/programs/kegiatan/store" method="POST">
                 @csrf
-                <input type="hidden" name="program_id" id="modal_program_id">
+                <input type="hidden" name="program_id" id="modal_program_id" value="{{ old('program_id') }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Kegiatan Baru</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -272,7 +286,7 @@
         <div class="modal-content">
             <form action="/programs/subkegiatan/store" method="POST">
                 @csrf
-                <input type="hidden" name="activity_id" id="modal_kegiatan_id">
+                <input type="hidden" name="activity_id" id="modal_kegiatan_id" value="{{ old('activity_id') }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Sub Kegiatan Baru</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

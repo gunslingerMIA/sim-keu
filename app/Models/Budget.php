@@ -13,9 +13,6 @@ class Budget extends Model
         'sub_activity_id',
         'account_id',
         'nominal',
-        'tahapan',
-        'versi',
-        'dasar_hukum',
         'tahun'
     ];
     //

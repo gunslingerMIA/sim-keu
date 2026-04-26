@@ -23,6 +23,7 @@ class AccountController extends Controller
             'nama_rekening' => 'required',
             'kelompok' => 'required'
         ]);
+        $request->merge(['tahun' => session('tahun_anggaran', date('Y'))]);
         Account::create($request->all());
         return redirect()->back()->with('success', 'Rekening berhasil ditambah!');
     }

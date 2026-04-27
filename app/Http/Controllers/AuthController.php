@@ -10,8 +10,9 @@ class AuthController extends Controller
 {
     //
     public function showLogin()
-    {
-        return view('auth.login');
+    {   
+        $tahun = Year::orderBy('tahun', 'desc')->get();
+        return view('auth.login', compact('tahun'));
     }
 
     public function login(Request $request)
@@ -27,31 +28,11 @@ class AuthController extends Controller
 
         if (auth()->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->route('tahun.pilih');
-        }
-
-        return back()->withErrors(['nip' => 'NIP atau password salah'])->withInput();
-    }
-
-    public function pilihTahun()
-    {
-        $years = Year::orderBy('tahun', 'desc')->get();
-        return view('auth.pilih-tahun', compact('years'));
-    }
-
-    public function simpanTahun(Request $request)
-    {
-        $request->validate([
-            'tahun' => 'required|exists:years,tahun',
-        ], [
-            'tahun.required' => 'Tahun belum dipilih',
-            'tahun.exists' => 'Tahun tidak valid',
-        ]);
-        session(['tahun_anggaran' => $request->tahun]);
+             session(['tahun_anggaran' => $request->tahun_anggaran]);
 
         // 2. CARI TAHAPAN AKTIF DI TAHUN TERSEBUT
         // Kita cari yang is_active-nya true khusus untuk tahun yang dipilih
-        $activeStage = \App\Models\Stage::where('tahun', $request->tahun)
+        $activeStage = \App\Models\Stage::where('tahun', $request->tahun_anggaran)
                                         ->where('is_active', true)
                                         ->first();
         if ($activeStage) {
@@ -65,8 +46,12 @@ class AuthController extends Controller
         }
 
         return redirect()->route('dashboard');
+        }
+
+        return back()->withErrors(['nip' => 'NIP atau password salah'])->withInput();
     }
 
+    
     public function logout(Request $request)
     {
         auth()->logout();

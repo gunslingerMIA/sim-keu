@@ -54,7 +54,18 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
+        // Cek apakah user yang mau dihapus adalah dirinya sendiri
+        if ($id === auth()->id()) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri demi keamanan!');
+        }
+
+        // Cek juga jika dia adalah admin terakhir (opsional tapi disarankan)
+        $adminCount = User::where('role', 'admin')->count();
+        if ($user->role === 'admin' && $adminCount <= 1) {
+            return back()->with('error', 'Sistem harus menyisakan minimal satu Administrator!');
+        }
+
         $user->delete();
 
         return back()->with('success', 'User ' . $user->name . ' berhasil dihapus');

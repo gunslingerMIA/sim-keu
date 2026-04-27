@@ -162,7 +162,7 @@
                     </span>
                 </div>
             </div>
-                
+
 
             <div class="mt-2 flex-grow-1">
                 <a class="nav-link {{ request()->is('dashboard') || request()->is('/') ? 'active' : '' }}"
@@ -171,28 +171,34 @@
                 </a>
 
                 <div class="menu-header">Data Master</div>
-                <a href="/programs" class="nav-link {{ request()->is('programs') ? 'active' : '' }}">
-                    <i class="bi bi-diagram-3"></i> Program Kegiatan
-                </a>
-                <a href="/accounts" class="nav-link {{ request()->is('accounts') ? 'active' : '' }}">
-                    <i class="bi bi-collection"></i> Akun
-                </a>
-                <a href="/budgets" class="nav-link {{ request()->is('budgets') ? 'active' : '' }}">
-                    <i class="bi bi-collection"></i> DPA
-                </a>
-                <a href="/users" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
-                    <i class="bi bi-collection"></i> User
-                </a>
+
+                <a href="#pengaturan" class="nav-link {{ request()->routeIs(['programs.*', 'budgets.*', 'accounts.*', 'users.*']) ? 'active' : '' }}" data-bs-toggle="collapse"><i class="bi bi-gear"></i>Setting Data</a>
+                <div class="collapse" id="pengaturan">
+                    <a href="/programs" class="nav-link {{ request()->is('programs') ? 'active' : '' }}">
+                        Program Kegiatan
+                    </a>
+                    <a href="/accounts" class="nav-link {{ request()->is('accounts') ? 'active' : '' }}">
+                       Akun
+                    </a>
+                    <a href="/budgets" class="nav-link {{ request()->is('budgets') ? 'active' : '' }}">
+                      DPA
+                    </a>
+                    <a href="/users" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
+                      User
+                    </a>
+                </div>
+
+
 
                 <div class="menu-header">Transaksi</div>
-                <a class="nav-link {{ request()->is('transactions') ? 'active' : '' }}" href="/transactions">
+                <a class="nav-link {{ request()->routeIs('transactions.*') ? 'active' : '' }}" href="/transactions">
                     <i class="bi bi-pencil-square"></i> Jurnal
                 </a>
 
                 <div class="menu-header">Pelaporan</div>
                 <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
                     href="#laporanSub">
-                    <span><i class="bi bi-chevron-down small"></i> Laporan</span>
+                    <span><i class="bi bi-journal-text small"></i> Laporan</span>
                 </a>
                 <div class="collapse {{ request()->is('reports*') ? 'show' : '' }}" id="laporanSub">
                     <a href="/reports/lra-ringkas" class="nav-link ps-5 small">LRA</a>

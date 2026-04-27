@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
+    protected $fillable = [
+    'batch_id',
+    'type',
+    'date',
+    'evidence_number',
+    'description',
+    'account_id',
+    'sub_activity_id',
+    'debit',
+    'credit'
+];
     //
     // Mencari nama akun dari transaksi
     public function account() {

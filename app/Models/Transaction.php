@@ -6,25 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    protected $fillable = [
-    'batch_id',
-    'type',
-    'date',
-    'evidence_number',
-    'description',
-    'account_id',
-    'sub_activity_id',
-    'debit',
-    'credit'
-];
+    protected $fillable = ['pkjur', 'tanggal', 'nobukti', 'keterangan', 'account_debit', 'account_kredit', 'sub_activity_id', 'jumlah'];
     //
-    // Mencari nama akun dari transaksi
-    public function account() {
-        return $this->belongsTo(Account::class);
+    // app/Models/Transaction.php
+
+    public function debitAccount()
+    {
+        // account_debit adalah foreign key di tabel transactions
+        return $this->belongsTo(Account::class, 'account_debit');
     }
 
-    // Mencari nama sub-kegiatan dari transaksi
-    public function subActivity() {
-        return $this->belongsTo(SubActivity::class);
+    public function kreditAccount()
+    {
+        // account_kredit adalah foreign key di tabel transactions
+        return $this->belongsTo(Account::class, 'account_kredit');
+    }
+
+    public function subActivity()
+    {
+        return $this->belongsTo(SubActivity::class, 'sub_activity_id');
     }
 }

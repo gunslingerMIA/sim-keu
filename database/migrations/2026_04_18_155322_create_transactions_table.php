@@ -13,20 +13,21 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('batch_id');          // ID kelompok (pengganti pkjur)
-            $table->date('date');
-            $table->string('evidence_number');   // Nomor kuitansi (A-03-001)
-            $table->string('description');
+            $table->string('pkjur'); // Menggunakan nama asli dari makro agar familiar
+            $table->date('tanggal');
+            $table->string('nobukti');
+            $table->text('keterangan'); // Pakai text agar bisa uraian panjang
             
-            // Relasi ke Akun (A45308...)
-            $table->foreignId('account_id')->constrained();
+            // Relasi Sisi Debit (Rekening Belanja/Pajak/Panjar)
+            $table->foreignId('account_debit')->constrained('accounts');
             
-            // Relasi ke Sub-Kegiatan (Kosong jika transaksi non-belanja)
+            // Relasi Sisi Kredit (Sumber Dana/Kas/Bank)
+            $table->foreignId('account_kredit')->constrained('accounts');
+            
+            // Relasi ke Sub-Kegiatan (Nullable untuk Non-Kegiatan)
             $table->foreignId('sub_activity_id')->nullable()->constrained();
             
-            
-            $table->decimal('debit', 15, 2)->default(0);
-            $table->decimal('credit', 15, 2)->default(0);
+            $table->decimal('jumlah', 15, 2)->default(0);
             $table->timestamps();
         });
     }

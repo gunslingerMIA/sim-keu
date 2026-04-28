@@ -18,7 +18,7 @@ return new class extends Migration
             
             // Kita kasih kategori supaya sistem nggak bingung
             // belanja = DPA, kas = Duit di brankas/bank, panjar = Uang muka kerja
-            $table->enum('kelompok', ['belanja', 'kas', 'panjar', 'pajak']);
+            $table->enum('kelompok', ['sub-kegiatan', 'non sub-kegiatan']);
             $table->timestamps();
         });
     }

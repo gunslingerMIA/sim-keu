@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('transactions', function (Blueprint $table) {
             //
-            $table->enum('type', ['JKK', 'JKM', 'JAK', 'JU'])->default('JKK')->after('batch_id');
+            $table->enum('type', ['JKK', 'JKM', 'JAK', 'JU'])->default('JKK')->after('pkjur');
         });
     }
 

@@ -16,12 +16,11 @@ class TransactionController extends Controller
 
     public function index()
     {
-        $tahun = session('tahun_anggaran');
+        $tahun = session('tahun_anggaran', date('Y'));
 
-        $transactions = Transaction::with(['account', 'subActivity'])
-            ->whereYear('date', $tahun)
-            ->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc')
+        $transactions = Transaction::with(['debitAccount', 'kreditAccount', 'subActivity'])
+            ->whereYear('tanggal', $tahun)
+            ->orderBy('tanggal', 'desc')
             ->get();
 
         return view('transactions.index', compact('transactions', 'tahun'));
@@ -46,7 +45,7 @@ class TransactionController extends Controller
             });
 
         // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar)
-        $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['pajak', 'kas', 'panjar'])
+        $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
             ->get()
             ->map(function ($a) {
                 return [
@@ -64,49 +63,70 @@ class TransactionController extends Controller
     }
 
     public function store(Request $request)
-{
-    // 1. Validasi Input
-    $request->validate([
-        'batch_id' => 'required',
-        'type' => 'required',
-        'date' => 'required|date',
-        'evidence_number' => 'required',
-        'description' => 'required',
-        'account_id' => 'required',      // ID Rekening yang didebit
-        'cash_account_id' => 'required', // ID Rekening yang dikredit
-        'amount' => 'required|numeric|min:1',
-    ]);
-
-    // 2. Simpan Transaksi dengan Database Transaction (Double Entry)
-    \DB::transaction(function () use ($request) {
-        
-        // BARIS DEBIT (Misal: Belanja ATK / Panjar)
-        \App\Models\Transaction::create([
-            'batch_id' => $request->batch_id,
-            'type' => $request->type,
-            'date' => $request->date,
-            'evidence_number' => $request->evidence_number,
-            'description' => $request->description,
-            'account_id' => $request->account_id,
-            'sub_activity_id' => $request->sub_activity_id, // Terisi jika belanja, NULL jika bukan
-            'debit' => $request->amount,
-            'credit' => 0,
+    {
+        // 1. Validasi Input
+        // Pastikan nama field di request sesuai dengan atribut 'name' di form HTML Bapak
+        $request->validate([
+            'tanggal'         => 'required|date',
+            'nobukti'         => 'required|string|max:50',
+            'keterangan'      => 'required|string',
+            'account_id'      => 'required|exists:accounts,id', // Sisi Debit
+            'cash_account_id' => 'required|exists:accounts,id', // Sisi Kredit
+            'amount'          => 'required|numeric|min:0',
+            'sub_activity_id' => 'nullable|exists:sub_activities,id',
+        ], [
+            'account_id.required' => 'Rekening debit harus dipilih.',
+            'cash_account_id.required' => 'Rekening kredit (sumber dana) harus dipilih.',
+            'amount.min' => 'Jumlah nominal tidak boleh nol.',
         ]);
+        // HANYA CEK PAGU JIKA ADA SUB_ACTIVITY_ID (Transaksi Belanja)
+        if ($request->sub_activity_id) {
+            
+            // 1. Cari Pagu di tabel budgets untuk rekening + sub kegiatan ini
+            $pagu = \App\Models\Budget::where('sub_activity_id', $request->sub_activity_id)
+                ->where('account_id', $request->account_id)
+                ->first();
 
-        // BARIS KREDIT (Misal: Kas Tunai / Bank)
-        \App\Models\Transaction::create([
-            'batch_id' => $request->batch_id,
-            'type' => $request->type,
-            'date' => $request->date,
-            'evidence_number' => $request->evidence_number,
-            'description' => $request->description,
-            'account_id' => $request->cash_account_id,
-            'sub_activity_id' => null, // Sisi Kas tidak pakai sub kegiatan
-            'debit' => 0,
-            'credit' => $request->amount,
-        ]);
-    });
+            if (!$pagu) {
+                return back()->withInput()->with('error', 'Rekening ini tidak terdaftar di DPA untuk sub kegiatan tersebut!');
+            }
 
-    return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil disimpan!');
-}
+            // 2. Hitung total realisasi yang sudah ada di tabel transactions
+            $totalRealisasi = \App\Models\Transaction::where('sub_activity_id', $request->sub_activity_id)
+                ->where('account_debit', $request->account_id)
+                ->sum('jumlah');
+
+            // 3. Hitung Sisa Pagu
+            $sisaPagu = $pagu->nominal - $totalRealisasi;
+
+            // 4. Bandingkan dengan input baru
+            if ($request->amount > $sisaPagu) {
+                $formattedSisa = number_format($sisaPagu, 0, ',', '.');
+                return back()->withInput()->with('error', "Anggaran jebol! Sisa pagu hanya Rp $formattedSisa. Anda mencoba menginput Rp " . number_format($request->amount, 0, ',', '.'));
+            }
+        }
+
+
+        try {
+            // 2. Proses Simpan ke Database
+            \App\Models\Transaction::create([
+                'pkjur'           => 'B' . date('ymdHis'), // Generate ID otomatis
+                'tanggal'         => $request->tanggal,
+                'nobukti'         => $request->nobukti,
+                'keterangan'      => $request->keterangan,
+                'account_debit'   => $request->account_id,
+                'account_kredit'  => $request->cash_account_id,
+                'sub_activity_id' => $request->sub_activity_id, // Nullable, otomatis terisi dari hidden input
+                'jumlah'          => $request->amount,
+            ]);
+
+            // 3. Redirect dengan pesan sukses
+            return redirect()->route('transactions.index')
+                ->with('success', 'Transaksi No. Bukti ' . $request->nobukti . ' berhasil disimpan.');
+
+        } catch (\Exception $e) {
+            // Jika ada error database, kembali ke form dengan pesan error
+            return back()->withInput()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+        }
+    }
 }

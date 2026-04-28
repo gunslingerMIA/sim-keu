@@ -14,7 +14,7 @@ class Account extends Model
                 $table->id();
                 $table->string('kode_rekening')->unique(); // Contoh: 5.1.02.01.0026
                 $table->string('nama_rekening');           // Contoh: Belanja Bahan Cetak
-                $table->enum('kelompok', ['belanja', 'kas', 'panjar', 'pajak']);
+                $table->enum('kelompok', ['sub-kegiatan', 'non sub-kegiatan']); // Contoh: sub-kegiatan untuk DPA, non sub-kegiatan untuk kas/panjar/pajak
                 $table->year('tahun');
                 $table->timestamps();
         });

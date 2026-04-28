@@ -14,33 +14,45 @@ class DashboardController extends Controller
 
     public function index()
     {
+        // Mengambil tahun dari session atau default tahun sekarang
         $tahun = session('tahun_anggaran', date('Y'));
 
-        // 1. Ambil Total Pagu (Sum dari tabel budgets)
-        $totalPagu = Budget::where('tahun', $tahun)->sum('nominal');
+        // 1. Ambil Total Pagu (Langsung dari database)
+        $totalPagu = \App\Models\Budget::where('tahun', $tahun)->sum('nominal');
 
-        // 2. Ambil Total Realisasi (Sum dari tabel transactions kelompok belanja)
-        $totalRealisasi = Transaction::whereYear('date', $tahun)
-            ->whereHas('account', function($q) {
-                $q->where('kelompok', 'belanja');
-            })->sum('debit');
+        // 2. Ambil Total Realisasi
+        // Kita filter hanya transaksi yang memiliki sub_activity_id (artinya transaksi belanja/kegiatan)
+        $totalRealisasi = \App\Models\Transaction::whereYear('tanggal', $tahun)
+            ->whereNotNull('sub_activity_id')
+            ->sum('jumlah');
 
-        // 3. Kalkulasi
+        // 3. Kalkulasi Ringkas
         $sisaAnggaran = $totalPagu - $totalRealisasi;
         $persenSerapan = $totalPagu > 0 ? ($totalRealisasi / $totalPagu) * 100 : 0;
 
-        // 4. Data Chart/Ringkasan Program
+        // 4. Data Program (Gunakan withSum agar database yang menghitung, bukan PHP)
+        // Ini jauh lebih cepat daripada flatMap
         $programs = \App\Models\Program::where('tahun', $tahun)
-            ->with(['activities.subActivities.budgets', 'activities.subActivities.transactions'])
+            ->with(['activities.subActivities' => function($query) {
+                // Kita ambil sub_activity sekaligus total budget dan total transaksi-nya
+                $query->withSum('budgets as total_pagu', 'nominal')
+                    ->withSum('transactions as total_realisasi', 'jumlah');
+            }])
             ->get()
             ->map(function ($p) {
-                $p->pagu = $p->activities->flatMap->subActivities->flatMap->budgets->sum('nominal');
-                $p->realisasi = $p->activities->flatMap->subActivities->flatMap->transactions->sum('debit');
+                // Menjumlahkan hasil sum dari cucu-cucunya (activities -> subActivities)
+                $p->pagu = $p->activities->sum(function($activity) {
+                    return $activity->subActivities->sum('total_pagu');
+                });
+                
+                $p->realisasi = $p->activities->sum(function($activity) {
+                    return $activity->subActivities->sum('total_realisasi');
+                });
+
                 $p->sisa = $p->pagu - $p->realisasi;
                 $p->persen = $p->pagu > 0 ? ($p->realisasi / $p->pagu) * 100 : 0;
                 return $p;
             });
-
 
         return view('dashboard', compact(
             'totalPagu', 

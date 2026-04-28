@@ -134,7 +134,7 @@ class AccountSeeder extends Seeder
                 'tahun' => session('tahun_anggaran', date('Y')),
                 'kode_rekening' => $account[0],
                 'nama_rekening' => $account[1],
-                'kelompok' => 'belanja'
+                'kelompok' => 'sub-kegiatan', // Semua ini masuk kategori sub-kegiatan karena terkait dengan DPA
             ]);
         }
 

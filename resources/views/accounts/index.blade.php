@@ -56,10 +56,8 @@
                         <label class="form-label">Kelompok Belanja</label>
                         <select name="kelompok" id="acc_kelompok" class="form-select" required>
                             <option value="">-- Pilih Kelompok --</option>
-                            <option value="belanja">Belanja</option>
-                            <option value="kas">Kas</option>
-                            <option value="pajak">Pajak</option>
-                            <option value="panjar">Panjar</option>
+                            <option value="sub-kegiatan">Sub-Kegiatan</option>
+                            <option value="non sub-kegiatan">Non Sub-Kegiatan</option>
                         </select>
                     </div>
                     <div class="mb-3">

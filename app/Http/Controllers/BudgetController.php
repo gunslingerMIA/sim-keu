@@ -9,6 +9,7 @@ use App\Models\Program;
 use App\Models\AppSetting;
 use App\Models\Stage;
 use Illuminate\Http\Request;
+use App\Models\Transaction;
 
 class BudgetController extends Controller
 {
@@ -131,6 +132,11 @@ class BudgetController extends Controller
 
     public function delete($id)
     {
+        //cek apakah ada transaksi
+        $adaTransaksi = Transaction::where('sub_activity_id', $id)->exists();
+        if ($adaTransaksi) {
+            return back()->with('error', 'Tidak dapat menghapus rincian anggaran karena terdapat transaksi terkait.');
+        }
         $budget = Budget::findOrFail($id);
         $budget->delete();
 

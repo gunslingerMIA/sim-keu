@@ -25,7 +25,7 @@
     <div class="container-xl">
         <div class="card shadow-sm">
             <div class="table-responsive">
-                <table class="table table-vcenter card-table table-striped table-hover">
+                <table class="table table-vcenter card-table table-striped table-hover" id="table">
                     <thead class="bg-light">
                         <tr>
                             <th style="width: 10%">Tanggal</th>
@@ -34,6 +34,7 @@
                             <th style="width: 25%">Debit (Penerima/Belanja)</th>
                             <th style="width: 25%">Kredit (Sumber Dana)</th>
                             <th class="text-end" style="width: 10%">Jumlah</th>
+                            <th class="text-center" style="width: 5%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,8 +77,13 @@
                             <td class="text-end fw-bold text-dark">
                                 {{ number_format($t->jumlah, 0, ',', '.') }}
                             </td>
+                            <td class="text-center d-flex gap-1 justify-content-center">
+                                <a href="" class="btn btn-sm btn-azure" title="Edit Transaksi"><i class="bi bi-pencil"></i></a>
+                                <a href="" class="btn btn-sm btn-danger" title="Hapus Transaksi" onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?')"><i class="bi bi-trash"></i></a>
+                            </td>
                         </tr>
-                        @empty
+                       
+                                    @empty
                         <tr>
                             <td colspan="6" class="text-center text-muted py-5">
                                 <div class="mb-2">

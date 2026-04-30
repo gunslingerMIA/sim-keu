@@ -24,6 +24,8 @@ class Transaction extends Model
 
     public function subActivity()
     {
-        return $this->belongsTo(SubActivity::class, 'sub_activity_id');
+        return $this->belongsTo(SubActivity::class);
     }
+
+    
 }

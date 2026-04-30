@@ -13,7 +13,8 @@
                 </div>
                 <div class="text-end">
                     <div class="text-muted small text-uppercase">Total Pagu Perangkat Daerah</div>
-                    <div class="h2 fw-bold text-azure">Rp {{ number_format($programs->sum('total_pagu'), 0, ',', '.') }}</div>
+                    <div class="h2 fw-bold text-azure">Rp {{ number_format($programs->sum('total_pagu'), 0, ',', '.') }}
+                    </div>
                 </div>
             </div>
 
@@ -23,7 +24,8 @@
                     <span class="input-icon-addon">
                         <i class="bi bi-search text-primary"></i>
                     </span>
-                    <input type="text" id="dpaSearch" class="form-control form-control-rounded" placeholder="Cari Kode atau Nama Sub Kegiatan... (Tekan Enter/Ketik)">
+                    <input type="text" id="dpaSearch" class="form-control form-control-rounded"
+                        placeholder="Cari Kode atau Nama Sub Kegiatan... (Tekan Enter/Ketik)">
                 </div>
             </div>
 
@@ -40,8 +42,7 @@
                         <tbody>
                             @foreach ($programs as $p)
                                 {{-- LEVEL 1: PROGRAM --}}
-                                <tr class="bg-primary-lt cursor-pointer fw-bold program-row" 
-                                    data-bs-toggle="collapse"
+                                <tr class="bg-primary-lt cursor-pointer fw-bold program-row" data-bs-toggle="collapse"
                                     data-bs-target="#prog-{{ $p->id }}" aria-expanded="false">
                                     <td>
                                         <i class="bi bi-chevron-right me-2 transition-icon"></i>
@@ -54,7 +55,8 @@
 
                                 <tr class="collapse" id="prog-{{ $p->id }}">
                                     <td colspan="3" class="p-0">
-                                        <table class="table table-vcenter mb-0 border-start border-primary border-3 nested-table">
+                                        <table
+                                            class="table table-vcenter mb-0 border-start border-primary border-3 nested-table">
                                             <tbody>
                                                 @foreach ($p->activities as $a)
                                                     {{-- LEVEL 2: KEGIATAN --}}
@@ -80,16 +82,20 @@
                                                                         <tr class="hover-shadow sub-activity-row">
                                                                             <td class="ps-5">
                                                                                 <span class="text-muted me-2">└─</span>
-                                                                                <small class="text-secondary">{{ $s->kode_sub_kegiatan }}</small>
-                                                                                <span class="ms-2 nama-sub">{{ $s->nama_sub_kegiatan }}</span>
+                                                                                <small
+                                                                                    class="text-secondary">{{ $s->kode_sub_kegiatan }}</small>
+                                                                                <span
+                                                                                    class="ms-2 nama-sub">{{ $s->nama_sub_kegiatan }}</span>
                                                                             </td>
-                                                                            <td class="text-end fw-bold text-azure" style="width: 250px;">
+                                                                            <td class="text-end fw-bold text-azure"
+                                                                                style="width: 250px;">
                                                                                 {{ number_format($s->total_pagu, 0, ',', '.') }}
                                                                             </td>
                                                                             <td class="pe-3">
                                                                                 <a href="/budgets/rinci/{{ $s->id }}"
                                                                                     class="btn btn-sm btn-white btn-pill border-azure text-azure shadow-sm">
-                                                                                    <i class="bi bi-gear-fill me-1"></i> Rincian
+                                                                                    <i class="bi bi-gear-fill me-1"></i>
+                                                                                    Rincian
                                                                                 </a>
                                                                             </td>
                                                                         </tr>
@@ -115,7 +121,7 @@
         document.getElementById('dpaSearch').addEventListener('keyup', function() {
             let value = this.value.toLowerCase();
             let subRows = document.querySelectorAll('.sub-activity-row');
-            
+
             // Reset state: Sembunyikan semua atau tampilkan semua
             if (value === "") {
                 document.querySelectorAll('.collapse').forEach(el => {
@@ -144,7 +150,8 @@
                         if (activityRow) activityRow.style.display = '';
 
                         // Buka "Kakek"-nya (Program)
-                        let programCollapse = activityCollapse.closest('.nested-table').closest('.collapse');
+                        let programCollapse = activityCollapse.closest('.nested-table').closest(
+                        '.collapse');
                         if (programCollapse) {
                             bootstrap.Collapse.getOrCreateInstance(programCollapse).show();
                             let programRow = programCollapse.previousElementSibling;
@@ -158,10 +165,28 @@
 
     <style>
         /* ... Style Abang yang lama ... */
-        .cursor-pointer { cursor: pointer; }
-        .transition-icon { transition: transform 0.3s ease; display: inline-block; }
-        tr[aria-expanded="true"] .transition-icon { transform: rotate(90deg); color: #206bc4; }
-        .hover-shadow:hover { background-color: #f1f5f9; transition: background-color 0.2s; }
-        .form-control-rounded { border-radius: 50px; padding-left: 40px; }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .transition-icon {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        tr[aria-expanded="true"] .transition-icon {
+            transform: rotate(90deg);
+            color: #206bc4;
+        }
+
+        .hover-shadow:hover {
+            background-color: #f1f5f9;
+            transition: background-color 0.2s;
+        }
+
+        .form-control-rounded {
+            border-radius: 50px;
+            padding-left: 40px;
+        }
     </style>
 @endsection

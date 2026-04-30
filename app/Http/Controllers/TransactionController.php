@@ -35,6 +35,9 @@ class TransactionController extends Controller
             ->where('tahun', $tahun)
             ->where('stage_id', $tahapan)
             ->get()
+            ->sortBy(function ($b) {
+                return $b->subActivity->kode_sub_kegiatan;
+            })
             ->map(function ($b) {
                 return [
                     'id' => $b->account_id,
@@ -42,8 +45,7 @@ class TransactionController extends Controller
                     'kelompok' => 'belanja',
                     'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
                 ];
-            });
-
+            }); 
         // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar)
         $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
             ->get()
@@ -119,6 +121,7 @@ class TransactionController extends Controller
                 'sub_activity_id' => $request->sub_activity_id, // Nullable, otomatis terisi dari hidden input
                 'jumlah'          => $request->amount,
             ]);
+            dd($request->sub_activity_id);
 
             // 3. Redirect dengan pesan sukses
             return redirect()->route('transactions.index')

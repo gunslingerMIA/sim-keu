@@ -70,7 +70,7 @@
                             </button>
                             
                             <button class="btn btn-sm btn-white text-danger" title="Hapus Program" 
-                                    onclick="event.stopPropagation(); confirmDelete('programs/delete/{{$p->id}}', {{$p->activities->count()}}, 'Program')">
+                                    onclick="event.stopPropagation(); confirmDelete('programs/delete/{{$p->id}}',  {{$p->activities->count()}}, 'Program')">
                                 <i class="bi bi-trash3"></i>
                             </button>
                         </div>
@@ -127,7 +127,7 @@
                                                     onclick="event.stopPropagation(); editSubKegiatan({{json_encode($s) }});">
                                                     <i class="bi bi-pencil-square"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-ghost-danger" title="Hapus Sub Kegiatan" onclick="confirmDelete('programs/sub/delete/{{$s->id}}', '0', 'Sub Kegiatan')"><i class="bi bi-trash3"></i ></button>
+                                                    <button class="btn btn-sm btn-ghost-danger" title="Hapus Sub Kegiatan" onclick="confirmDelete('programs/sub/delete/{{$s->id}}',{{$s->budgets->count()}}, '0', 'Sub Kegiatan')"><i class="bi bi-trash3"></i ></button>
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -393,9 +393,10 @@
         modal.show();
     }
 
-    function confirmDelete(url, ChildCount, type='data'){
+    function confirmDelete(url, dpa, ChildCount, type='data'){
 
         console.log(url);
+        console.log(dpa);
         console.log(ChildCount);
         console.log(type);
         //cek ada anak apa enggak
@@ -405,6 +406,15 @@
                 icon: 'error',
                     title: 'Akses Ditolak',
                     text: type+'  ini masih memiliki ' +ChildCount+ ' Data di Bawahnya',
+                    confirmButtonColor: '#3b82f6'
+            });
+            return;
+        }
+        if (dpa > 0 ){
+             Swal.fire({
+                icon: 'error',
+                    title: 'Akses Ditolak',
+                    text: type+'  ini masih memiliki anggaran di dalamnya',
                     confirmButtonColor: '#3b82f6'
             });
             return;

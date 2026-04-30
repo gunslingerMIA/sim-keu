@@ -31,7 +31,7 @@
                     </td>
                     <td class="d-flex">
                         <button class="btn btn-sm btn-ghost-warning" data-bs-toggle="modal" data-bs-target="#modal-akun"  onclick="fillModalAkun({{ json_encode($acc) }})">Edit</button>
-                        <button class="btn btn-sm btn-ghost-danger" onclick="confirmDelete('/accounts/delete/{{$acc->id}}', {{$acc->budgets->count()}}, 'Akun')">hapus</button>
+                        <button class="btn btn-sm btn-ghost-danger" onclick="confirmDelete('/accounts/delete/{{$acc->id}}', {{ $acc->transactions_as_debit_count + $acc->transactions_as_kredit_count }}, {{$acc->budgets->count()}}, 'Akun')">hapus</button>
                     </td>
                     
                 </tr>
@@ -109,9 +109,10 @@
 
     
 
-    function confirmDelete(url, ChildCount, type='data'){
+    function confirmDelete(url, JurnalCount, ChildCount, type='data'){
 
         console.log(url);
+        console.log(JurnalCount);
         console.log(ChildCount);
         console.log(type);
         //cek ada anak apa enggak
@@ -121,6 +122,15 @@
                 icon: 'error',
                     title: 'Akses Ditolak',
                     text: type+'  ini masih memiliki ' +ChildCount+ ' Data di Bawahnya',
+                    confirmButtonColor: '#3b82f6'
+            });
+            return;
+        }
+        if (JurnalCount > 0 ){
+             Swal.fire({
+                icon: 'error',
+                    title: 'Akses Ditolak',
+                    text: type+'  ini memiliki transaksi di dalamnya',
                     confirmButtonColor: '#3b82f6'
             });
             return;

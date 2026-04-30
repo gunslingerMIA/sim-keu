@@ -132,12 +132,15 @@ class BudgetController extends Controller
 
     public function delete($id)
     {
+         $budget = Budget::findOrFail($id);
         //cek apakah ada transaksi
-        $adaTransaksi = Transaction::where('sub_activity_id', $id)->exists();
+        $adaTransaksi = Transaction::where('sub_activity_id', $budget->sub_activity_id)
+                                    ->where('account_debit', $budget->account_id)
+                                    ->exists();
         if ($adaTransaksi) {
             return back()->with('error', 'Tidak dapat menghapus rincian anggaran karena terdapat transaksi terkait.');
         }
-        $budget = Budget::findOrFail($id);
+       
         $budget->delete();
 
         return back()->with('success', 'Rincian anggaran berhasil dihapus.');

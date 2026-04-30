@@ -12,7 +12,8 @@ class AccountController extends Controller
 
     public function index()
     {
-        $accounts = Account::orderBy('kode_rekening')->get();
+        $accounts = Account::orderBy('kode_rekening')->get();// Di Controller
+        $accounts = Account::withCount(['transactionsAsDebit', 'transactionsAsKredit'])->get();
         return view('accounts.index', compact('accounts'));
     }
 

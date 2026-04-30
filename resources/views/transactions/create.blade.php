@@ -2,7 +2,16 @@
 
 @section('content')
     <div class="page-header d-print-none">
+
         <div class="container-xl">
+            <ol class="breadcrumb mb-3" aria-label="breadcrumbs">
+                <li class="breadcrumb-item">
+                    <a href="{{ route('transactions.index') }}">Transaksi</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <a href="{{ route('transactions.add') }}">Input Jurnal Transaksi</a>
+                </li>
+            </ol>
             <div class="row g-2 align-items-center">
                 <div class="col">
                     <h2 class="page-title text-primary">
@@ -155,54 +164,67 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const debitSelect = document.getElementById('account_debit_select');
-            const kreditSelect = document.getElementById('account_kredit_select');
-            const hiddenSubId = document.getElementById('sub_activity_id_hidden');
+   document.addEventListener('DOMContentLoaded', function() {
+    const debitSelectEl = document.getElementById('account_debit_select');
+    const kreditSelectEl = document.getElementById('account_kredit_select');
+    const hiddenSubId = document.getElementById('sub_activity_id_hidden');
 
-            debitSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const selectedValue = this.value;
+    // Simpan semua opsi asli Kredit ke dalam variabel saat halaman dimuat
+    const allKreditOptions = Array.from(kreditSelectEl.options).map(opt => {
+        return { value: opt.value, text: opt.text };
+    });
 
-                // 1. Update Sub Activity ID Hidden
-                hiddenSubId.value = selectedOption.getAttribute('data-sub') || '';
+    debitSelectEl.addEventListener('change', function() {
+        const selectedValue = this.value;
+        const selectedOption = this.options[this.selectedIndex];
+        
+        // 1. Update Sub Activity ID Hidden
+        hiddenSubId.value = selectedOption ? (selectedOption.getAttribute('data-sub') || '') : '';
+        
+        // 2. Ambil instance TomSelect Kredit
+        const tsKredit = kreditSelectEl.tomselect;
 
-                // 2. Reset Kredit Select
-                Array.from(kreditSelect.options).forEach(option => {
-                    option.disabled = false;
-                    option.style.display = 'block';
-                });
+        if (tsKredit) {
+            const currentKreditValue = tsKredit.getValue();
 
-                // 3. Filter: Jangan biarkan akun yang sama dipilih di Kredit
-                if (selectedValue) {
-                    Array.from(kreditSelect.options).forEach(option => {
-                        if (option.value === selectedValue) {
-                            option.disabled = true;
-                            option.style.display = 'none';
-                        }
+            // STEP A: Bersihkan semua opsi yang ada di TomSelect
+            tsKredit.clearOptions();
+
+            // STEP B: Masukkan lagi opsi satu per satu, kecuali yang sama dengan Debit
+            allKreditOptions.forEach(opt => {
+                if (opt.value !== selectedValue || opt.value === "") {
+                    tsKredit.addOption({
+                        value: opt.value,
+                        text: opt.text
                     });
-
-                    if (kreditSelect.value === selectedValue) {
-                        kreditSelect.value = '';
-                    }
                 }
             });
-        });
 
+            // STEP C: Jika nilai kredit sebelumnya bukan yang dilarang, pasang kembali
+            if (currentKreditValue !== selectedValue) {
+                tsKredit.setValue(currentKreditValue);
+            } else {
+                tsKredit.setValue("");
+            }
+
+            // STEP D: Refresh tampilan
+            tsKredit.refreshOptions(false);
+        }
+    });
+});
         document.addEventListener("DOMContentLoaded", function() {
             // Inisialisasi Tom Select
 
-                document.querySelectorAll('.ts_select').forEach((el) => {
-                    new TomSelect(el, {
-                        create: false,
-                        sortField: {
-                            field: "text",
-                            direction: "asc"
-                        },
-                        dropdownParent: 'body'
-                    });
+            document.querySelectorAll('.ts_select').forEach((el) => {
+                new TomSelect(el, {
+                    create: false,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    dropdownParent: 'body'
                 });
+            });
         });
-        
     </script>
 @endsection

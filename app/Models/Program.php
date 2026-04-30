@@ -25,4 +25,6 @@ class Program extends Model
     {
         return $this->hasMany(Activity::class);
     }
+
+    
 }

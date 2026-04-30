@@ -24,5 +24,22 @@ class Account extends Model
     {
         return $this->hasMany(Budget::class);
     }
+
    
+    public function transactionsAsDebit()
+    {
+        return $this->hasMany(Transaction::class, 'account_debit');
+    }
+
+    public function transactionsAsKredit()
+    {
+        return $this->hasMany(Transaction::class, 'account_kredit');
+    }
+
+   public function getTotalTransactionsCountAttribute()
+    {
+        return $this->transactions_as_debit_count + $this->transactions_as_kredit_count;
+        
+    
+    }
 }

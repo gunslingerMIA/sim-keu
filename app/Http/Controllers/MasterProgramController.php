@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Activity;
 use App\Models\SubActivity;
+use App\Models\Budget;
 
 class MasterProgramController extends Controller
 {
     public function index()
     {
+        $budget = Budget::withCount('subActivity')->get();
         // Narik Program beserta Kegiatan dan Sub-Kegiatannya (Eager Loading)
         $programs = Program::with('activities.subActivities')->where('tahun', session('tahun_anggaran', date('Y')))->get();
         

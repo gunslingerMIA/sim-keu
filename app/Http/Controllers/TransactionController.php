@@ -132,4 +132,18 @@ class TransactionController extends Controller
             return back()->withInput()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
+
+    public function delete($id)
+    {
+        try {
+            $transaction = Transaction::findOrFail($id);
+            $transaction->delete();
+
+            return redirect()->route('transactions.index')
+                ->with('success', 'Transaksi berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->route('transactions.index')
+                ->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
+    }
 }

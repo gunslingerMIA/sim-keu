@@ -111,9 +111,8 @@
                                     <td class="">
                                         <a href="" class="btn btn-sm btn-azure" title="Edit Transaksi"><i
                                                 class="bi bi-pencil"></i></a>
-                                        <a href="" class="btn btn-sm btn-danger" title="Hapus Transaksi"
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?')"><i
-                                                class="bi bi-trash"></i></a>
+                                        <a href="{{ url('/transactions/delete/'.$t->id) }}" class="btn btn-sm btn-danger" title="Hapus Transaksi"
+                                            onclick="confirmDelete(event, this.href)"><i class="bi bi-trash"></i></a>
                                     </td>
                                 </tr>
 
@@ -130,4 +129,25 @@
             </div>
         </div>
     </div>
+
+    <script>
+            function confirmDelete(event, url) {
+                event.preventDefault();
+                
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Transaksi yang sudah dihapus tidak bisa dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = url;                       
+                    }
+                })
+            }
+    </script>
 @endsection

@@ -164,54 +164,6 @@
     </div>
 
     <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    const debitSelectEl = document.getElementById('account_debit_select');
-    const kreditSelectEl = document.getElementById('account_kredit_select');
-    const hiddenSubId = document.getElementById('sub_activity_id_hidden');
-
-    // Simpan semua opsi asli Kredit ke dalam variabel saat halaman dimuat
-    const allKreditOptions = Array.from(kreditSelectEl.options).map(opt => {
-        return { value: opt.value, text: opt.text };
-    });
-
-    debitSelectEl.addEventListener('change', function() {
-        const selectedValue = this.value;
-        const selectedOption = this.options[this.selectedIndex];
-        
-        // 1. Update Sub Activity ID Hidden
-        hiddenSubId.value = selectedOption ? (selectedOption.getAttribute('data-sub') || '') : '';
-        
-        // 2. Ambil instance TomSelect Kredit
-        const tsKredit = kreditSelectEl.tomselect;
-
-        if (tsKredit) {
-            const currentKreditValue = tsKredit.getValue();
-
-            // STEP A: Bersihkan semua opsi yang ada di TomSelect
-            tsKredit.clearOptions();
-
-            // STEP B: Masukkan lagi opsi satu per satu, kecuali yang sama dengan Debit
-            allKreditOptions.forEach(opt => {
-                if (opt.value !== selectedValue || opt.value === "") {
-                    tsKredit.addOption({
-                        value: opt.value,
-                        text: opt.text
-                    });
-                }
-            });
-
-            // STEP C: Jika nilai kredit sebelumnya bukan yang dilarang, pasang kembali
-            if (currentKreditValue !== selectedValue) {
-                tsKredit.setValue(currentKreditValue);
-            } else {
-                tsKredit.setValue("");
-            }
-
-            // STEP D: Refresh tampilan
-            tsKredit.refreshOptions(false);
-        }
-    });
-});
         document.addEventListener("DOMContentLoaded", function() {
             // Inisialisasi Tom Select
 
@@ -226,5 +178,57 @@
                 });
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const debitSelectEl = document.getElementById('account_debit_select');
+            const kreditSelectEl = document.getElementById('account_kredit_select');
+            const hiddenSubId = document.getElementById('sub_activity_id_hidden');
+
+            // Simpan semua opsi asli Kredit ke dalam variabel saat halaman dimuat
+            const allKreditOptions = Array.from(kreditSelectEl.options).map(opt => {
+                return {
+                    value: opt.value,
+                    text: opt.text
+                };
+            });
+
+            debitSelectEl.addEventListener('change', function() {
+                const selectedValue = this.value;
+                const selectedOption = this.options[this.selectedIndex];
+
+                // 1. Update Sub Activity ID Hidden
+                hiddenSubId.value = selectedOption ? (selectedOption.getAttribute('data-sub') || '') : '';
+
+                // 2. Ambil instance TomSelect Kredit
+                const tsKredit = kreditSelectEl.tomselect;
+
+                if (tsKredit) {
+                    const currentKreditValue = tsKredit.getValue();
+
+                    // STEP A: Bersihkan semua opsi yang ada di TomSelect
+                    tsKredit.clearOptions();
+
+                    // STEP B: Masukkan lagi opsi satu per satu, kecuali yang sama dengan Debit
+                    allKreditOptions.forEach(opt => {
+                        if (opt.value !== selectedValue || opt.value === "") {
+                            tsKredit.addOption({
+                                value: opt.value,
+                                text: opt.text
+                            });
+                        }
+                    });
+
+                    // STEP C: Jika nilai kredit sebelumnya bukan yang dilarang, pasang kembali
+                    if (currentKreditValue !== selectedValue) {
+                        tsKredit.setValue(currentKreditValue);
+                    } else {
+                        tsKredit.setValue("");
+                    }
+
+                    // STEP D: Refresh tampilan
+                    tsKredit.refreshOptions(false);
+                }
+            });
+        });
+        
     </script>
 @endsection

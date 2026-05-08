@@ -17,13 +17,45 @@ class TransactionController extends Controller
     public function index()
     {
         $tahun = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
 
         $transactions = Transaction::with(['debitAccount', 'kreditAccount', 'subActivity'])
             ->whereYear('tanggal', $tahun)
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        return view('transactions.index', compact('transactions', 'tahun'));
+        $budgetData = \App\Models\Budget::with(['account', 'subActivity'])
+            ->where('tahun', $tahun)
+            ->where('stage_id', $tahapan)
+            ->get()
+            ->sortBy('subActivity.kode_sub_kegiatan') // Urutkan berdasarkan nama sub kegiatan
+            ->map(function ($b) {
+                return [
+                    'id' => $b->account_id,
+                    'sub_activity_id' => $b->sub_activity_id,
+                    'kelompok' => 'belanja',
+                    'kode' => $b->subActivity->kode_sub_kegiatan,
+                    'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
+                ];
+            });
+        // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar)
+        $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
+            ->get()
+            ->map(function ($a) {
+                return [
+                    'id' => $a->id,
+                    'sub_activity_id' => null, // Non-belanja tidak ada sub-kegiatan
+                    'kelompok' => 'Non-Belanja',
+                    'kode' => $a->kode_rekening,
+                    'display' => $a->nama_rekening
+                ];
+            });
+
+        // 3. Gabungkan keduanya
+        // $allOptions = $budgetData->concat($nonBudgetData);
+        $allOptions = $budgetData->merge($nonBudgetData); // Gunakan merge untuk menggabungkan koleksi
+
+        return view('transactions.index', compact('transactions', 'tahun', 'allOptions', 'nonBudgetData'));
     }
 
     public function add()
@@ -146,5 +178,61 @@ class TransactionController extends Controller
             return redirect()->route('transactions.index')
                 ->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
         }
+    }
+
+    // public function edit($id)
+    // {
+    //     $transaction = Transaction::findOrFail($id);
+    //     $tahun = session('tahun_anggaran');
+    //     $tahapan = session('active_stage_id');
+
+    //     
+
+    //     // Cari display untuk Debit
+    //     $selectedDebit = $allOptions->first(function ($item) use ($transaction) {
+    //         return $item['id'] == $transaction->account_debit && $item['sub_activity_id'] == $transaction->sub_activity_id;
+    //     });
+
+    //     // Cari display untuk Kredit
+    //     $selectedKredit = $nonBudgetData->firstWhere('id', $transaction->account_kredit);
+
+    //     return view('transactions.edit', compact('transaction', 'allOptions', 'selectedDebit', 'selectedKredit'));
+    // }
+
+    public function update(Request $request, $id)
+    {
+        $transaction = \App\Models\Transaction::findOrFail($id);
+
+        // (Gunakan validasi yang sama dengan Store...)
+
+        if ($request->sub_activity_id) {
+            $pagu = \App\Models\Budget::where('sub_activity_id', $request->sub_activity_id)
+                ->where('account_id', $request->debit_account_id)
+                ->first();
+
+            // Hitung realisasi transaksi LAIN (kecuali transaksi yang sedang diedit ini)
+            $realisasiLain = \App\Models\Transaction::where('sub_activity_id', $request->sub_activity_id)
+                ->where('account_debit', $request->debit_account_id)
+                ->where('id', '!=', $id) // ABAIKAN TRANSAKSI INI
+                ->sum('jumlah');
+
+            $sisaPaguTersedia = $pagu->nominal - $realisasiLain;
+
+            if ($request->amount > $sisaPaguTersedia) {
+                return back()->withInput()->with('error', "Update Gagal! Total belanja melebihi sisa pagu.");
+            }
+        }
+
+        $transaction->update([
+            'tanggal'         => $request->tanggal,
+            'nobukti'         => $request->nobukti,
+            'keterangan'      => $request->keterangan,
+            'account_debit'   => $request->debit_account_id,
+            'account_kredit'  => $request->kredit_account_id,
+            'sub_activity_id' => $request->sub_activity_id,
+            'jumlah'          => $request->amount,
+        ]);
+
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui.');
     }
 }

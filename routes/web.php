@@ -57,6 +57,9 @@ Route::middleware('auth')->group(function () {
         // Rute untuk memproses data yang dikirim dari Form (Method POST)
         Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 
+        Route::get('/edit/{id}', [TransactionController::class, 'edit'])->name('transactions.edit');
+        Route::put('/update/{id}', [TransactionController::class, 'update'])->name('transactions.update');
+
         //hapus
         Route::get('/delete/{id}', [TransactionController::class, 'delete'])->name('transactions.delete');
     });

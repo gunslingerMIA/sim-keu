@@ -237,42 +237,18 @@
         }
 
         function selectAccount(accountId, subId, displayText) {
-            const debitId = document.getElementById('debit_account_id').value;
-            const kreditId = document.getElementById('kredit_account_id').value;
-
-            // VALIDASI: Cek apakah akun yang dipilih sama dengan akun di sisi lawan
             if (currentSide === 'debit') {
-                if (accountId === kreditId) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Akun Sama',
-                        text: 'Akun Debit tidak boleh sama dengan Akun Kredit!',
-                        confirmButtonColor: '#3b82f6'
-                    });
-                    return; // Hentikan proses
-                }
-
                 document.getElementById('debit_account_id').value = accountId;
-                document.getElementById('sub_activity_id').value = subId;
+                document.getElementById('sub_activity_id').value = subId; // ID Sub Kegiatan hanya untuk debit
                 document.getElementById('debit_display').value = displayText;
-
             } else {
-                if (accountId === debitId) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Akun Sama',
-                        text: 'Akun Kredit tidak boleh sama dengan Akun Debit!',
-                        confirmButtonColor: '#3b82f6'
-                    });
-                    return; // Hentikan proses
-                }
-
                 document.getElementById('kredit_account_id').value = accountId;
                 document.getElementById('kredit_display').value = displayText;
             }
 
-            // Tutup modal jika validasi lolos
-            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modal-search-account'));
+            // Tutup modal secara manual
+            const modalElement = document.getElementById('modal-search-account');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
             modalInstance.hide();
         }
 
@@ -283,7 +259,23 @@
 
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(value) ? '' : 'none';
+                const kelompok = row.getAttribute('data-kelompok'); // Pastikan atribut ini ada
+
+                // Logika Pencocokan Teks
+                const isMatch = text.includes(value);
+
+                // Logika Filter Kredit (Jika sedang di sisi kredit, belanja tetap harus mati)
+                let isAllowed = true;
+                if (currentSide === 'kredit' && kelompok === 'belanja') {
+                    isAllowed = false;
+                }
+
+                // Baris hanya tampil jika (Teks Cocok) DAN (Kategori Diizinkan)
+                if (isMatch && isAllowed) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
             });
         });
     </script>

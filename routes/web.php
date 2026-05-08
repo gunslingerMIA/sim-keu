@@ -8,6 +8,7 @@ use App\Http\Controllers\MasterProgramController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -65,12 +66,17 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('users')->group(function(){
-    Route::get('/', [UserController::class, 'index'])->name('users.index');
-    Route::post('/store', [UserController::class, 'store'])->name('users.store');
-    Route::get('/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
-    Route::put('/update/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::put('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.reset-password');
-});
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::post('/store', [UserController::class, 'store'])->name('users.store');
+        Route::get('/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
+        Route::put('/update/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::put('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.reset-password');
+    });
+    Route::prefix('reports')->group(function(){
+        Route::get('/journal', [ReportController::class, 'journalIndex'])->name('reports.journal');
+        Route::get('/journal/print', [ReportController::class, 'journalPrint'])->name('reports.journal.print');
+    });
+
 
 
 

@@ -63,4 +63,17 @@ class DashboardController extends Controller
             'tahun'
         ));
     }
+
+    public function journalIndex()
+    {
+        $tahun = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
+
+        $transactions = Transaction::with(['debitAccount', 'kreditAccount', 'subActivity'])
+            ->whereYear('tanggal', $tahun)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return view('reports.journal', compact('transactions', 'tahun'));
+    }
 }

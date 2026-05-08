@@ -98,39 +98,35 @@
                             <div class="col-12">
                                 <div class="p-4 bg-primary-lt border border-primary rounded-3">
                                     <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold text-primary">1. Rekening DEBIT
-                                                (Belanja/Kegiatan)</label>
-                                            <select class="form-select ts_select select-search" name="account_id"
-                                                id="account_debit_select" required>
-                                                <option value="">-- Pilih Rekening --</option>
-                                                @foreach ($allOptions as $option)
-                                                    <option value="{{ $option['id'] }}"
-                                                        data-sub="{{ $option['sub_activity_id'] }}">
-                                                        {{ $option['display'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            {{-- Hidden input untuk sub_activity_id --}}
-                                            <input type="hidden" name="sub_activity_id" id="sub_activity_id_hidden">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Akun Debit</label>
+                                            <div class="input-group">
+                                                <input type="text" id="debit_display" class="form-control" readonly
+                                                    placeholder="Pilih Akun Debit...">
+                                                <input type="hidden" name="debit_account_id" id="debit_account_id">
+                                                <input type="hidden" name="sub_activity_id" id="sub_activity_id">
+                                                <button class="btn btn-primary" type="button"
+                                                    onclick="openModal('debit')">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
                                         </div>
 
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold text-danger">2. Rekening KREDIT (Sumber
-                                                Dana)</label>
-                                            <select class="form-select ts_select" name="cash_account_id"
-                                                id="account_kredit_select" required>
-                                                <option value="">-- Pilih Sumber Dana --</option>
-                                                @foreach ($nonBudgetData as $option)
-                                                    <option value="{{ $option['id'] }}">
-                                                        {{ $option['display'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Akun Kredit</label>
+                                            <div class="input-group">
+                                                <input type="text" id="kredit_display" class="form-control" readonly
+                                                    placeholder="Pilih Akun Kredit...">
+                                                <input type="hidden" name="kredit_account_id" id="kredit_account_id">
+                                                <button class="btn btn-primary" type="button"
+                                                    onclick="openModal('kredit')">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div class="col-md-12">
-                                            <label class="form-label fw-bold">3. Nominal Transaksi</label>
+                                            <label class="form-label fw-bold">Nominal Transaksi</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">Rp</span>
                                                 <input type="number" value="{{ old('amount') }}"
@@ -162,73 +158,134 @@
             </form>
         </div>
     </div>
+    <div class="modal modal-blur fade" id="modal-search-account" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pilih Rekening / Anggaran</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-icon mb-3">
+                        <span class="input-icon-addon"><i class="bi bi-search"></i></span>
+                        <input type="text" id="table_filter" class="form-control"
+                            placeholder="Cari Kode atau Nama...">
+                    </div>
+                    <div class="table-responsive" style="max-height: 450px;">
+                        <table class="table table-vcenter table-hover" id="account_table">
+                            <thead>
+                                <tr>
+                                    <th>Kategori</th>
+                                    <th>Kode & Rekening</th>
+                                    <th class="w-1"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($allOptions as $opt)
+                                    <tr class="account-row" data-kelompok="{{ $opt['kelompok'] }}"
+                                        onclick="selectAccount('{{ $opt['id'] }}', '{{ $opt['sub_activity_id'] }}', '{{ $opt['display'] }}')"
+                                        style="cursor:pointer">
+                                        <td>
+                                            <span
+                                                class="badge {{ $opt['kelompok'] == 'Belanja' ? 'bg-blue-lt' : 'bg-green-lt' }}">
+                                                {{ $opt['kelompok'] }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="text-muted small">{{ $opt['kode'] }}</div>
+                                            <div>{{ $opt['display'] }}</div>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-primary">Pilih</button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Inisialisasi Tom Select
+        let currentSide = 'debit'; // Penanda apakah sedang pilih debit atau kredit
 
-            document.querySelectorAll('.ts_select').forEach((el) => {
-                new TomSelect(el, {
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    dropdownParent: 'body'
-                });
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const debitSelectEl = document.getElementById('account_debit_select');
-            const kreditSelectEl = document.getElementById('account_kredit_select');
-            const hiddenSubId = document.getElementById('sub_activity_id_hidden');
+        function openModal(side) {
+            currentSide = side;
+            const rows = document.querySelectorAll('.account-row');
 
-            // Simpan semua opsi asli Kredit ke dalam variabel saat halaman dimuat
-            const allKreditOptions = Array.from(kreditSelectEl.options).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.text
-                };
-            });
+            rows.forEach(row => {
+                const kelompok = row.getAttribute('data-kelompok');
 
-            debitSelectEl.addEventListener('change', function() {
-                const selectedValue = this.value;
-                const selectedOption = this.options[this.selectedIndex];
-
-                // 1. Update Sub Activity ID Hidden
-                hiddenSubId.value = selectedOption ? (selectedOption.getAttribute('data-sub') || '') : '';
-
-                // 2. Ambil instance TomSelect Kredit
-                const tsKredit = kreditSelectEl.tomselect;
-
-                if (tsKredit) {
-                    const currentKreditValue = tsKredit.getValue();
-
-                    // STEP A: Bersihkan semua opsi yang ada di TomSelect
-                    tsKredit.clearOptions();
-
-                    // STEP B: Masukkan lagi opsi satu per satu, kecuali yang sama dengan Debit
-                    allKreditOptions.forEach(opt => {
-                        if (opt.value !== selectedValue || opt.value === "") {
-                            tsKredit.addOption({
-                                value: opt.value,
-                                text: opt.text
-                            });
-                        }
-                    });
-
-                    // STEP C: Jika nilai kredit sebelumnya bukan yang dilarang, pasang kembali
-                    if (currentKreditValue !== selectedValue) {
-                        tsKredit.setValue(currentKreditValue);
-                    } else {
-                        tsKredit.setValue("");
-                    }
-
-                    // STEP D: Refresh tampilan
-                    tsKredit.refreshOptions(false);
+                if (currentSide === 'kredit') {
+                    // Jika KREDIT, sembunyikan yang kategori Belanja
+                    row.style.display = (kelompok === 'belanja') ? 'none' : '';
+                } else {
+                    // Jika DEBIT, tampilkan semua (karena debit bisa belanja atau pindah kas)
+                    row.style.display = '';
                 }
             });
+
+            const myModal = new bootstrap.Modal(document.getElementById('modal-search-account'));
+            myModal.show();
+
+            setTimeout(() => {
+                document.getElementById('table_filter').value = ''; // Reset filter teks
+                document.getElementById('table_filter').focus();
+            }, 500);
+        }
+
+        function selectAccount(accountId, subId, displayText) {
+            const debitId = document.getElementById('debit_account_id').value;
+            const kreditId = document.getElementById('kredit_account_id').value;
+
+            // VALIDASI: Cek apakah akun yang dipilih sama dengan akun di sisi lawan
+            if (currentSide === 'debit') {
+                if (accountId === kreditId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Akun Sama',
+                        text: 'Akun Debit tidak boleh sama dengan Akun Kredit!',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    return; // Hentikan proses
+                }
+
+                document.getElementById('debit_account_id').value = accountId;
+                document.getElementById('sub_activity_id').value = subId;
+                document.getElementById('debit_display').value = displayText;
+
+            } else {
+                if (accountId === debitId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Akun Sama',
+                        text: 'Akun Kredit tidak boleh sama dengan Akun Debit!',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    return; // Hentikan proses
+                }
+
+                document.getElementById('kredit_account_id').value = accountId;
+                document.getElementById('kredit_display').value = displayText;
+            }
+
+            // Tutup modal jika validasi lolos
+            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modal-search-account'));
+            modalInstance.hide();
+        }
+
+        // Fitur Filter Pencarian Tabel
+        document.getElementById('table_filter').addEventListener('keyup', function() {
+            const value = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#account_table tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(value) ? '' : 'none';
+            });
         });
-        
     </script>
+
 @endsection

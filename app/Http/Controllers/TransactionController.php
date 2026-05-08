@@ -27,7 +27,7 @@ class TransactionController extends Controller
     }
 
     public function add()
-    {   
+    {
         $tahun = session('tahun_anggaran');
         $tahapan = session('active_stage_id');
 
@@ -35,17 +35,16 @@ class TransactionController extends Controller
             ->where('tahun', $tahun)
             ->where('stage_id', $tahapan)
             ->get()
-            ->sortBy(function ($b) {
-                return $b->subActivity->kode_sub_kegiatan;
-            })
+            ->sortBy('subActivity.kode_sub_kegiatan') // Urutkan berdasarkan nama sub kegiatan
             ->map(function ($b) {
                 return [
                     'id' => $b->account_id,
                     'sub_activity_id' => $b->sub_activity_id,
                     'kelompok' => 'belanja',
+                    'kode' => $b->subActivity->kode_sub_kegiatan,
                     'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
                 ];
-            }); 
+            });
         // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar)
         $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
             ->get()
@@ -53,82 +52,84 @@ class TransactionController extends Controller
                 return [
                     'id' => $a->id,
                     'sub_activity_id' => null, // Non-belanja tidak ada sub-kegiatan
-                    'type' => $a->kelompok,
+                    'kelompok' => 'Non-Belanja',
+                    'kode' => $a->kode_rekening,
                     'display' => $a->nama_rekening
                 ];
             });
 
         // 3. Gabungkan keduanya
-        $allOptions = $budgetData->concat($nonBudgetData);
-        
+        // $allOptions = $budgetData->concat($nonBudgetData);
+        $allOptions = $budgetData->merge($nonBudgetData); // Gunakan merge untuk menggabungkan koleksi
+
+        // dd($allOptions->all());
+
         return view('transactions.create', compact('allOptions', 'nonBudgetData'));
     }
 
     public function store(Request $request)
     {
         // 1. Validasi Input
-        // Pastikan nama field di request sesuai dengan atribut 'name' di form HTML Bapak
         $request->validate([
-            'tanggal'         => 'required|date',
-            'nobukti'         => 'required|string|max:50',
-            'keterangan'      => 'required|string',
-            'account_id'      => 'required|exists:accounts,id', // Sisi Debit
-            'cash_account_id' => 'required|exists:accounts,id', // Sisi Kredit
-            'amount'          => 'required|numeric|min:0',
-            'sub_activity_id' => 'nullable|exists:sub_activities,id',
+            'tanggal'           => 'required|date',
+            'nobukti'           => 'required|string|max:50',
+            'keterangan'        => 'required|string',
+            'debit_account_id'  => 'required|exists:accounts,id',
+            'kredit_account_id' => 'required|required|exists:accounts,id',
+            'amount'            => 'required|numeric|min:1', // Minimal 1 rupiah
+            'sub_activity_id'   => 'nullable|exists:sub_activities,id',
         ], [
-            'account_id.required' => 'Rekening debit harus dipilih.',
-            'cash_account_id.required' => 'Rekening kredit (sumber dana) harus dipilih.',
-            'amount.min' => 'Jumlah nominal tidak boleh nol.',
+            'debit_account_id.required'  => 'Rekening debit harus dipilih.',
+            'kredit_account_id.required' => 'Rekening kredit harus dipilih.',
+            'amount.min'                 => 'Jumlah nominal tidak boleh nol.',
         ]);
-        // HANYA CEK PAGU JIKA ADA SUB_ACTIVITY_ID (Transaksi Belanja)
+
+        // 2. VALIDASI TAMBAHAN: Akun Debit & Kredit tidak boleh sama
+        if ($request->debit_account_id == $request->kredit_account_id) {
+            return back()->withInput()->with('error', 'Akun Debit dan Kredit tidak boleh sama!');
+        }
+
+        // 3. CEK PAGU (Hanya jika ada Sub Kegiatan / Transaksi Belanja)
         if ($request->sub_activity_id) {
-            
-            // 1. Cari Pagu di tabel budgets untuk rekening + sub kegiatan ini
+
+            // Cari Pagu di DPA
             $pagu = \App\Models\Budget::where('sub_activity_id', $request->sub_activity_id)
-                ->where('account_id', $request->account_id)
+                ->where('account_id', $request->debit_account_id)
                 ->first();
 
             if (!$pagu) {
-                return back()->withInput()->with('error', 'Rekening ini tidak terdaftar di DPA untuk sub kegiatan tersebut!');
+                return back()->withInput()->with('error', 'Rekening ini tidak memiliki anggaran (Pagu) di DPA untuk sub kegiatan terpilih!');
             }
 
-            // 2. Hitung total realisasi yang sudah ada di tabel transactions
+            // Hitung total realisasi (Sisi Debit)
             $totalRealisasi = \App\Models\Transaction::where('sub_activity_id', $request->sub_activity_id)
-                ->where('account_debit', $request->account_id)
+                ->where('account_debit', $request->debit_account_id) // Pastikan kolom di DB sesuai
                 ->sum('jumlah');
 
-            // 3. Hitung Sisa Pagu
             $sisaPagu = $pagu->nominal - $totalRealisasi;
 
-            // 4. Bandingkan dengan input baru
             if ($request->amount > $sisaPagu) {
                 $formattedSisa = number_format($sisaPagu, 0, ',', '.');
-                return back()->withInput()->with('error', "Anggaran jebol! Sisa pagu hanya Rp $formattedSisa. Anda mencoba menginput Rp " . number_format($request->amount, 0, ',', '.'));
+                return back()->withInput()->with('error', "Anggaran melampaui sisa pagu! Sisa pagu: Rp $formattedSisa.");
             }
         }
 
-
         try {
-            // 2. Proses Simpan ke Database
+            // 4. Proses Simpan
             \App\Models\Transaction::create([
-                'pkjur'           => 'B' . date('ymdHis'), // Generate ID otomatis
+                'pkjur'           => 'B' . date('ymdHis') . rand(10, 99), // Tambah random biar gak bentrok jika input cepat
                 'tanggal'         => $request->tanggal,
                 'nobukti'         => $request->nobukti,
                 'keterangan'      => $request->keterangan,
-                'account_debit'   => $request->account_id,
-                'account_kredit'  => $request->cash_account_id,
-                'sub_activity_id' => $request->sub_activity_id, // Nullable, otomatis terisi dari hidden input
+                'account_debit'   => $request->debit_account_id,
+                'account_kredit'  => $request->kredit_account_id,
+                'sub_activity_id' => $request->sub_activity_id,
                 'jumlah'          => $request->amount,
             ]);
-            dd($request->sub_activity_id);
 
-            // 3. Redirect dengan pesan sukses
             return redirect()->route('transactions.index')
                 ->with('success', 'Transaksi No. Bukti ' . $request->nobukti . ' berhasil disimpan.');
-
         } catch (\Exception $e) {
-            // Jika ada error database, kembali ke form dengan pesan error
             return back()->withInput()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }

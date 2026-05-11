@@ -142,6 +142,8 @@
             background-color: #f6f8fb;
         }
     </style>
+
+    @stack('after_style')
 </head>
 
 <body>
@@ -196,14 +198,14 @@
                 </a>
 
                 <div class="menu-header">Pelaporan</div>
-                <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+                <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs(['reports.*']) ? 'active' : '' }}" data-bs-toggle="collapse"
                     href="#laporanSub">
                     <span><i class="bi bi-journal-text small"></i> Laporan</span>
                 </a>
-                <div class="collapse {{ request()->is('reports*') ? 'show' : '' }}" id="laporanSub">
-                    <a href="/reports/journal" class="nav-link ps-5 small">Jurnal Transaksi</a>
-                    <a href="/reports/buku-besar" class="nav-link ps-5 small">Buku Besar Akun</a>
-                    <a href="/reports/neraca" class="nav-link ps-5 small">Neraca Saldo</a>
+                <div class="collapse " id="laporanSub">
+                    <a href="/reports/journal" class="nav-link ps-5 small {{ request()->routeIs(['reports.journal']) ? 'active' : '' }}">Jurnal Transaksi</a>
+                    <a href="/reports/buku-besar" class="nav-link ps-5 small {{ request()->routeIs(['reports.buku-besar']) ? 'active' : '' }}">Buku Besar Akun</a>
+                    <a href="/reports/neraca" class="nav-link ps-5 small {{ request()->routeIs(['reports.neraca']) ? 'active' : '' }}">Neraca Saldo</a>
                 </div>
             </div>
 

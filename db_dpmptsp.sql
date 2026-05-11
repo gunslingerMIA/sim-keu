@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 29, 2026 at 10:13 AM
+-- Generation Time: May 11, 2026 at 10:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -227,7 +227,6 @@ CREATE TABLE `budgets` (
 --
 
 INSERT INTO `budgets` (`id`, `sub_activity_id`, `account_id`, `nominal`, `stage_id`, `versi`, `dasar_hukum`, `tahun`, `created_at`, `updated_at`) VALUES
-(2, 3, 42, 3900000, 1, 1, NULL, '2026', '2026-04-28 20:13:41', '2026-04-28 20:13:41'),
 (3, 3, 35, 900000, 1, 1, NULL, '2026', '2026-04-28 20:13:51', '2026-04-28 20:13:51'),
 (4, 1, 35, 125000, 1, 1, NULL, '2026', '2026-04-28 20:16:02', '2026-04-28 20:16:02'),
 (6, 1, 42, 975000, 1, 1, NULL, '2026', '2026-04-28 20:18:24', '2026-04-28 20:18:24'),
@@ -354,7 +353,8 @@ INSERT INTO `budgets` (`id`, `sub_activity_id`, `account_id`, `nominal`, `stage_
 (127, 31, 46, 55200000, 1, 1, NULL, '2026', '2026-04-29 00:43:55', '2026-04-29 00:43:55'),
 (128, 31, 67, 2712000, 1, 1, NULL, '2026', '2026-04-29 00:44:05', '2026-04-29 00:44:05'),
 (129, 31, 68, 168000, 1, 1, NULL, '2026', '2026-04-29 00:44:36', '2026-04-29 00:44:36'),
-(130, 31, 69, 216000, 1, 1, NULL, '2026', '2026-04-29 00:44:44', '2026-04-29 00:44:44');
+(130, 31, 69, 216000, 1, 1, NULL, '2026', '2026-04-29 00:44:44', '2026-04-29 00:44:44'),
+(131, 3, 42, 3900000, 1, 1, NULL, '2026', '2026-05-06 22:04:51', '2026-05-06 22:04:51');
 
 -- --------------------------------------------------------
 
@@ -520,7 +520,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('BfyJ917R6jewkwRxs1XOxeLvCCJ4Lr1zdjfojE57', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTo4OntzOjY6Il90b2tlbiI7czo0MDoiTkt5N2VFdEE1eGdtYTRMWklXN3h0c0tiUkZRWEltMm1mZjJDTmxLeiI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czoyMToiaHR0cDovLzEyNy4wLjAuMTo4MDAwIjt9czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hY2NvdW50cyI7czo1OiJyb3V0ZSI7czoxNDoiYWNjb3VudHMuaW5kZXgiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MTQ6InRhaHVuX2FuZ2dhcmFuIjtzOjQ6IjIwMjYiO3M6MTU6ImFjdGl2ZV9zdGFnZV9pZCI7aToxO3M6MTI6Im5hbWFfdGFoYXBhbiI7czoxMDoiQVBCRCBNdXJuaSI7fQ==', 1777450249);
+('b9QVz5onHdiVJtE5A7R1JGe7y8JdC9QGrUosk0WJ', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTo4OntzOjY6Il90b2tlbiI7czo0MDoiTnJtMGI3RXUyc0haR2tZQ255Zzg2Q3JZZ2VYUkNRaUV6YjBPUXN2TCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Nzk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9yZXBvcnRzL2pvdXJuYWw/ZW5kX2RhdGU9MjAyNi0wNS0zMSZzdGFydF9kYXRlPTIwMjYtMDUtMDEiO3M6NToicm91dGUiO3M6MTU6InJlcG9ydHMuam91cm5hbCI7fXM6MzoidXJsIjthOjE6e3M6ODoiaW50ZW5kZWQiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90cmFuc2FjdGlvbnMiO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MTQ6InRhaHVuX2FuZ2dhcmFuIjtzOjQ6IjIwMjYiO3M6MTU6ImFjdGl2ZV9zdGFnZV9pZCI7aToxO3M6MTI6Im5hbWFfdGFoYXBhbiI7czoxMDoiQVBCRCBNdXJuaSI7fQ==', 1778225155),
+('cx11BvZKnF5GPcqpz1Nmpnm5HOcNqnpk3Al117LK', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTo4OntzOjY6Il90b2tlbiI7czo0MDoibERPQzRFdGw5RW5iMTlxZ1h6b2NnV3dqaGZFZWZmZ1M2V1RVUUtqMCI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNDoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL3RyYW5zYWN0aW9ucyI7fXM6OToiX3ByZXZpb3VzIjthOjI6e3M6MzoidXJsIjtzOjc5OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvcmVwb3J0cy9qb3VybmFsP2VuZF9kYXRlPTIwMjYtMDUtMzAmc3RhcnRfZGF0ZT0yMDI2LTA0LTAxIjtzOjU6InJvdXRlIjtzOjE1OiJyZXBvcnRzLmpvdXJuYWwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MTQ6InRhaHVuX2FuZ2dhcmFuIjtzOjQ6IjIwMjYiO3M6MTU6ImFjdGl2ZV9zdGFnZV9pZCI7aToxO3M6MTI6Im5hbWFfdGFoYXBhbiI7czoxMDoiQVBCRCBNdXJuaSI7fQ==', 1778487696);
 
 -- --------------------------------------------------------
 
@@ -589,7 +590,7 @@ INSERT INTO `sub_activities` (`id`, `tahun`, `activity_id`, `kode_sub_kegiatan`,
 (22, '2026', 8, '2.18.02.2.02.0004', 'Penyusunan Peta Potensi Investasi', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
 (23, '2026', 9, '2.18.03.2.01.0002', 'Pelaksanaan Kegiatan Promosi Penanaman Modal Daerah Kabupaten/Kota', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
 (24, '2026', 10, '2.18.04.2.01.0005', 'Koordinasi dan Sinkronisasi Penetapan Pemberian Fasilitas/Insentif Daerah', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
-(25, '2026', 10, '2.18.04.2.01.0006', 'KPenyediaan Pelayanan Perizinan Berusaha melalui Sistem Perizinan Berusaha Berbasis Risiko Terintegrasi secara Elektronik', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
+(25, '2026', 10, '2.18.04.2.01.0006', 'Penyediaan Pelayanan Perizinan Berusaha melalui Sistem Perizinan Berusaha Berbasis Risiko Terintegrasi secara Elektronik', '2026-04-27 23:23:53', '2026-05-06 23:12:22'),
 (26, '2026', 10, '2.18.04.2.01.0007', 'Penyediaan dan pengelolaan Layanan konsultasi perizinan berusaha berbasis risiko', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
 (27, '2026', 10, '2.18.04.2.01.0008', 'Pemantauan, analisis, evaluasi, dan pelaporan di bidang perizinan berusaha berbasis risiko', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
 (28, '2026', 11, '2.18.05.2.01.0004', 'Penyelesaian Permasalahan dan Hambatan yang dihadapi Pelaku Usaha dalam merealisasikan Kegiatan Usahanya', '2026-04-27 23:23:53', '2026-04-27 23:23:53'),
@@ -623,7 +624,8 @@ CREATE TABLE `transactions` (
 --
 
 INSERT INTO `transactions` (`id`, `pkjur`, `type`, `tanggal`, `nobukti`, `keterangan`, `account_debit`, `account_kredit`, `sub_activity_id`, `jumlah`, `created_at`, `updated_at`) VALUES
-(2, 'B260429031421', 'JKK', '2026-04-29', 'A-03-001', 'Belanja makmin rapat', 35, 108, 3, 300000.00, '2026-04-28 20:14:21', '2026-04-28 20:14:21');
+(4, 'B26050801151217', 'JKK', '2026-05-08', 'A-03-001', 'Fotokopi jilid', 35, 108, 1, 90000.00, '2026-05-07 18:15:12', '2026-05-07 23:00:55'),
+(5, 'B26051107311037', 'JKK', '2026-05-11', 'A-03-002', 'Makmin rapat evaluasi', 42, 108, 3, 260000.00, '2026-05-11 00:31:10', '2026-05-11 00:31:10');
 
 -- --------------------------------------------------------
 
@@ -833,7 +835,7 @@ ALTER TABLE `app_settings`
 -- AUTO_INCREMENT for table `budgets`
 --
 ALTER TABLE `budgets`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -875,7 +877,7 @@ ALTER TABLE `sub_activities`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`

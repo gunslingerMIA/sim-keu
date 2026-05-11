@@ -1,6 +1,66 @@
 @extends('layouts.app')
 
 @section('content')
+    @push('after_style')
+        <style>
+            /* Hilangkan background abu-abu bawaan striped atau light */
+            .table-jurnal,
+            .table-jurnal tbody,
+            .table-jurnal tr,
+            .table-jurnal td {
+                background-color: #fff !important;
+            }
+
+            /* Hilangkan semua border bawaan */
+            .table-jurnal {
+                border-collapse: collapse !important;
+            }
+
+            .table-jurnal td,
+            .table-jurnal th {
+                border: none !important;
+                /* Hapus semua garis sel */
+                padding: 4px 8px !important;
+                border-left: 1px solid #000 !important;
+                /* Garis kiri */
+                border-right: 1px solid #000 !important;
+                /* Garis kanan */
+            }
+
+            /* Berikan garis tipis hanya di bagian bawah grup transaksi (sebagai pemisah) */
+            .border-group-bottom {
+                border-bottom: 1px solid #000 !important;
+            }
+
+            /* Khusus Header Tabel */
+            .table-jurnal thead th {
+                border-top: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+                font-weight: bold;
+               
+            }
+
+            /* Atur teks agar pas saat dicetak */
+            @media print {
+
+                .page-header,
+                .navbar,
+                .d-print-none {
+                    display: none !important;
+                }
+
+                .card,  {
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+
+                body {
+                    background: #fff !important;
+                }
+            }
+        </style>
+    @endpush
+
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -44,7 +104,7 @@
             </div>
 
             {{-- Area Pratinjau Jurnal --}}
-            <div class="card card-stacked">
+            <div class="card">
                 <div class="card-body">
                     <div class="text-center mb-4 d-none d-print-block">
                         <h2 class="mb-0">JURNAL TRANSAKSI</h2>
@@ -52,51 +112,51 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead class="bg-light text-center">
+                        <table class="table table-sm table-jurnal">
+                            <thead>
                                 <tr>
-                                    <th width="15%">Tanggal / ID</th>
-                                    <th>Uraian Rekening & Keterangan</th>
-                                    <th width="15%">Debit</th>
-                                    <th width="15%">Kredit</th>
+                                    <th width="15%">TANGGAL / ID</th>
+                                    <th>URAIAN REKENING & KETERANGAN</th>
+                                    <th width="15%" class="text-end">DEBIT</th>
+                                    <th width="15%" class="text-end">KREDIT</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($transactions as $t)
-                                    {{-- Baris Utama (Debit): Tetap biarkan border top normal --}}
-                                    <tr class="">
-                                        <td class="fw-bold border-bottom-0 border-y-1">
-                                            {{ date('d/m/Y', strtotime($t->tanggal)) }}<br><small
-                                                class="text-muted">{{ $t->pkjur }}</small></td>
-                                        <td class="border-bottom-0">{{ $t->debitAccount->kode_rekening }} -
-                                            {{ $t->debitAccount->nama_rekening }}</td>
-                                        <td class="text-end text-primary border-bottom-0">Rp
-                                            {{ number_format($t->jumlah, 0, ',', '.') }}</td>
-                                        <td class="bg-light border-bottom-0"></td>
-                                    </tr>
-
-                                    {{-- Baris Kredit: Hilangkan border top agar menyatu dengan baris di atasnya --}}
+                                    {{-- BARIS 1: DEBIT --}}
                                     <tr>
-                                        <td class="border-0"></td>
-                                        <td class="ps-4 border-y-0"><em>{{ $t->kreditAccount->kode_rekening }} -
-                                                {{ $t->kreditAccount->nama_rekening }}</em></td>
-                                        <td class="bg-light border-y-0"></td>
-                                        <td class="text-end text-success border-y-0">Rp
-                                            {{ number_format($t->jumlah, 0, ',', '.') }}</td>
-                                    </tr>
-
-                                    {{-- Baris Keterangan: Hilangkan border top, tapi biarkan border bottom untuk pemisah antar transaksi --}}
-                                    <tr>
-                                        <td class="border-top-0"></td>
-                                        <td class="small text-muted border-top-0">
-                                            Ket: {{ $t->keterangan }} <br>
-                                            <strong>Bukti: {{ $t->nobukti }}</strong>
+                                        <td class="fw-bold">{{ date('d/m/Y', strtotime($t->tanggal)) }}</td>
+                                        <td>{{ $t->debitAccount->kode_rekening }} - {{ $t->debitAccount->nama_rekening }}
                                         </td>
-                                        <td class="border-top-0"></td>
-                                        <td class="border-top-0"></td>
+                                        <td class="text-end">Rp {{ number_format($t->jumlah, 0, ',', '.') }}</td>
+                                        <td></td>
+                                    </tr>
+
+                                    {{-- BARIS 2: KREDIT --}}
+                                    <tr>
+                                        <td class="text-muted small">{{ $t->pkjur }}</td>
+                                        <td class="ps-4">
+                                            &nbsp;&nbsp; {{ $t->kreditAccount->kode_rekening }} -
+                                            {{ $t->kreditAccount->nama_rekening }}
+                                        </td>
+                                        <td></td>
+                                        <td class="text-end">Rp {{ number_format($t->jumlah, 0, ',', '.') }}</td>
+                                    </tr>
+
+                                    {{-- BARIS 3: KETERANGAN --}}
+                                    <tr class="border-group-bottom">
+                                        <td></td>
+                                        <td class="small">
+                                            Ket: {{ $t->keterangan }} <br>
+                                            Bukti: {{ $t->nobukti }}
+                                        </td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>
                                 @empty
-                                    {{-- ... data kosong ... --}}
+                                    <tr>
+                                        <td colspan="4" class="text-center">Data tidak ditemukan</td>
+                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>

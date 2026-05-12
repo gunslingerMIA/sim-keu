@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('reports')->group(function(){
         Route::get('/journal', [ReportController::class, 'journalIndex'])->name('reports.journal');
         Route::get('/journal/print', [ReportController::class, 'journalPrint'])->name('reports.journal.print');
+        Route::get('/reports/journal/export', [ReportController::class, 'journalExport'])->name('reports.journal.export');
     });
 
 

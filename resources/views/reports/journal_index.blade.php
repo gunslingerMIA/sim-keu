@@ -37,7 +37,7 @@
                 border-top: 1px solid #000 !important;
                 border-bottom: 1px solid #000 !important;
                 font-weight: bold;
-               
+
             }
 
             /* Atur teks agar pas saat dicetak */
@@ -49,14 +49,15 @@
                     display: none !important;
                 }
 
-                .card,  {
-                    border: none !important;
-                    box-shadow: none !important;
-                }
+                .card,
+                {
+                border: none !important;
+                box-shadow: none !important;
+            }
 
-                body {
-                    background: #fff !important;
-                }
+            body {
+                background: #fff !important;
+            }
             }
         </style>
     @endpush
@@ -73,6 +74,10 @@
                         class="btn btn-primary {{ $transactions->isEmpty() ? 'disabled' : '' }}">
                         <i class="bi bi-printer me-2"></i> Cetak Jurnal
                     </button>
+                    <a href="{{ route('reports.journal.export', ['start_date' => $start, 'end_date' => $end]) }}"
+                        class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel me-2"></i> Ekspor Excel
+                    </a>
                 </div>
             </div>
         </div>

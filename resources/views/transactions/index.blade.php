@@ -115,7 +115,7 @@
                                             data-debit_id="{{ $t->account_debit }}"
                                             data-kredit_id="{{ $t->account_kredit }}"
                                             data-sub_id="{{ $t->sub_activity_id }}" data-jumlah="{{ $t->jumlah }}"
-                                            data-debit_display="{{ $t->subActivity->nama_sub_kegiatan . ' - ' . $t->debitAccount->nama_rekening }}"
+                                            data-debit_display="{{ optional($t->subActivity)->nama_sub_kegiatan ? $t->subActivity->nama_sub_kegiatan . ' - ' : '' }}{{ $t->debitAccount->nama_rekening ?? 'N/A' }}"
                                             data-kredit_display="{{ $t->kreditAccount->nama_rekening }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>

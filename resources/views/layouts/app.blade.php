@@ -204,7 +204,7 @@
                 </a>
                 <div class="collapse " id="laporanSub">
                     <a href="/reports/journal" class="nav-link ps-5 small {{ request()->routeIs(['reports.journal']) ? 'active' : '' }}">Jurnal Transaksi</a>
-                    <a href="/reports/buku-besar" class="nav-link ps-5 small {{ request()->routeIs(['reports.buku-besar']) ? 'active' : '' }}">Buku Besar Akun</a>
+                    <a href="/reports/ledger" class="nav-link ps-5 small {{ request()->routeIs(['reports.ledger']) ? 'active' : '' }}">Buku Besar Akun</a>
                     <a href="/reports/neraca" class="nav-link ps-5 small {{ request()->routeIs(['reports.neraca']) ? 'active' : '' }}">Neraca Saldo</a>
                 </div>
             </div>

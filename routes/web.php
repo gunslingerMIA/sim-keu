@@ -77,6 +77,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/journal/print', [ReportController::class, 'journalPrint'])->name('reports.journal.print');
         Route::get('/reports/journal/export', [ReportController::class, 'journalExport'])->name('reports.journal.export');
         Route::get('/ledger', [ReportController::class, 'ledgerIndex'])->name('reports.ledger');
+        Route::get('/ledger/export', [ReportController::class, 'ledgerExport'])->name('reports.ledger.export');
     });
 
 

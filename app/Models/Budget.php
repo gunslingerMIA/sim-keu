@@ -37,4 +37,12 @@ class Budget extends Model
         return $query->where('tahapan', $tahapan)
                      ->where('tahun', session('tahun_anggaran', date('Y')));
     }
+
+    // TAMBAHKAN RELASI INI: Budget terhubung ke banyak transaksi
+    public function transactions()
+    {
+        // Hubungkan berdasarkan kesamaan account_id DAN sub_activity_id
+        return $this->hasMany(Transaction::class, 'account_debit', 'account_id')
+                    ->whereColumn('sub_activity_id', 'sub_activity_id');
+    }
 }

@@ -8,6 +8,7 @@ use App\Exports\JournalExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Account;
 use App\Exports\LedgerExport;
+use App\Exports\LraExport;
 
 class ReportController extends Controller
 {
@@ -218,5 +219,167 @@ class ReportController extends Controller
         // 6. Jalankan Proses Download Excel
         $filename = 'Buku_Besar_' . str_replace('.', '_', $selectedAccount) . '_' . date('Ymd_His') . '.xlsx';
         return Excel::download(new LedgerExport($mutations, $saldoAwal, $start, $end, $accountName), $filename);
+    }
+
+    public function lraIndex(Request $request)
+    {
+        // Logika untuk menampilkan halaman laporan LRA
+        $tahunAnggaran = session('tahun_anggaran', date('Y'));
+
+        //filter parameter
+        $end = $request->get('end_date', $tahunAnggaran . '-12-31'); //
+
+        $jenisLra = $request->get('jenis_lra', 'ringkas'); // default ke 'ringkas' jika tidak ada input
+
+        //ambil struktur program sampai budget
+        $programs = \App\Models\Program::where('tahun', $tahunAnggaran)
+            ->with([
+                'activities.subActivities.budgets' => function ($query) use ($tahunAnggaran) {
+                    $query->where('tahun', $tahunAnggaran)->with('account');
+                }
+            ])
+            ->get();
+
+        //mapping data
+        $processedData = $programs->map(function ($program) use ($end) {
+            foreach ($program->activities as $activity) {
+                foreach ($activity->subActivities as $subActivity) {
+
+                    $subActivity->budgets->transform(function ($budget) use ($end) {
+                        // Hitung realisasi murni belanja (Debit)
+                        $realisasi = \App\Models\Transaction::where('account_debit', $budget->account_id)
+                            ->where('sub_activity_id', $budget->sub_activity_id)
+                            ->where('tanggal', '<=', $end)
+                            ->sum('jumlah');
+
+                        // Ganti 'pagu' di bawah ini dengan nama kolom pagu murni di DB Abang
+                        $paguMurni = $budget->nominal;
+                        $sisa = $paguMurni - $realisasi;
+                        $persen = $paguMurni > 0 ? ($realisasi / $paguMurni) * 100 : 0;
+
+                        $budget->pagu_murni = $paguMurni;
+                        $budget->realisasi = $realisasi;
+                        $budget->sisa = $sisa;
+                        $budget->persen = $persen;
+
+                        return $budget;
+                    });
+
+                    // Total level Sub-Kegiatan
+                    $subActivity->total_pagu = $subActivity->budgets->sum('pagu_murni');
+                    $subActivity->total_realisasi = $subActivity->budgets->sum('realisasi');
+                    $subActivity->total_sisa = $subActivity->total_pagu - $subActivity->total_realisasi;
+                    $subActivity->total_persen = $subActivity->total_pagu > 0 ? ($subActivity->total_realisasi / $subActivity->total_pagu) * 100 : 0;
+                }
+
+                // Total level Kegiatan
+                $activity->total_pagu = $activity->subActivities->sum('total_pagu');
+                $activity->total_realisasi = $activity->subActivities->sum('total_realisasi');
+                $activity->total_sisa = $activity->total_pagu - $activity->total_realisasi;
+                $activity->total_persen = $activity->total_pagu > 0 ? ($activity->total_realisasi / $activity->total_pagu) * 100 : 0;
+            }
+
+            // Total level Program
+            $program->total_pagu = $program->activities->sum('total_pagu');
+            $program->total_realisasi = $program->activities->sum('total_realisasi');
+            $program->total_sisa = $program->total_pagu - $program->total_realisasi;
+            $program->total_persen = $program->total_pagu > 0 ? ($program->total_realisasi / $program->total_pagu) * 100 : 0;
+
+            return $program;
+        });
+
+        // Grand Total SKPD
+        $grandPagu = $processedData->sum('total_pagu');
+        $grandRealisasi = $processedData->sum('total_realisasi');
+        $grandSisa = $grandPagu - $grandRealisasi;
+        $grandPersen = $grandPagu > 0 ? ($grandRealisasi / $grandPagu) * 100 : 0;
+
+        return view('reports.lra_index', compact(
+            'processedData',
+            'end',
+            'jenisLra',
+            'tahunAnggaran',
+            'grandPagu',
+            'grandRealisasi',
+            'grandSisa',
+            'grandPersen'
+        ));
+    }
+
+    public function lraExport(Request $request)
+    {
+        $tahun = session('tahun_anggaran', date('Y'));
+        $endDate = $request->get('end_date', $tahun . '-12-31');
+        $jenisLra = $request->get('jenis_lra', 'ringkas');
+
+        // Ambil raw data yang sama dari logic index LRA Abang sebelumnya
+        $programs = \App\Models\Program::where('tahun', $tahun)->with(['activities.subActivities.budgets.account'])->get();
+
+        // Jalankan mapping transform untuk menghitung realisasi & pagu (Gunakan logic penghitungan sum yang sama persis seperti lraIndex Abang)
+        $processedData = $programs->map(function ($program) use ($endDate) {
+            foreach ($program->activities as $activity) {
+                foreach ($activity->subActivities as $subActivity) {
+
+                    $subActivity->budgets->transform(function ($budget) use ($endDate) {
+                        // Hitung realisasi murni belanja (Debit)
+                        $realisasi = \App\Models\Transaction::where('account_debit', $budget->account_id)
+                            ->where('sub_activity_id', $budget->sub_activity_id)
+                            ->where('tanggal', '<=', $endDate)
+                            ->sum('jumlah');
+
+                        // Ganti 'pagu' di bawah ini dengan nama kolom pagu murni di DB Abang
+                        $paguMurni = $budget->nominal;
+                        $sisa = $paguMurni - $realisasi;
+                        $persen = $paguMurni > 0 ? ($realisasi / $paguMurni) * 100 : 0;
+
+                        $budget->pagu_murni = $paguMurni;
+                        $budget->realisasi = $realisasi;
+                        $budget->sisa = $sisa;
+                        $budget->persen = $persen;
+
+                        return $budget;
+                    });
+
+                    // Total level Sub-Kegiatan
+                    $subActivity->total_pagu = $subActivity->budgets->sum('pagu_murni');
+                    $subActivity->total_realisasi = $subActivity->budgets->sum('realisasi');
+                    $subActivity->total_sisa = $subActivity->total_pagu - $subActivity->total_realisasi;
+                    $subActivity->total_persen = $subActivity->total_pagu > 0 ? ($subActivity->total_realisasi / $subActivity->total_pagu) * 100 : 0;
+                }
+
+                // Total level Kegiatan
+                $activity->total_pagu = $activity->subActivities->sum('total_pagu');
+                $activity->total_realisasi = $activity->subActivities->sum('total_realisasi');
+                $activity->total_sisa = $activity->total_pagu - $activity->total_realisasi;
+                $activity->total_persen = $activity->total_pagu > 0 ? ($activity->total_realisasi / $activity->total_pagu) * 100 : 0;
+            }
+
+            // Total level Program
+            $program->total_pagu = $program->activities->sum('total_pagu');
+            $program->total_realisasi = $program->activities->sum('total_realisasi');
+            $program->total_sisa = $program->total_pagu - $program->total_realisasi;
+            $program->total_persen = $program->total_pagu > 0 ? ($program->total_realisasi / $program->total_pagu) * 100 : 0;
+
+            return $program;
+        });
+
+         // Grand Total SKPD
+        $grandPagu = $processedData->sum('total_pagu');
+        $grandRealisasi = $processedData->sum('total_realisasi');
+        $grandSisa = $grandPagu - $grandRealisasi;
+        $grandPersen = $grandPagu > 0 ? ($grandRealisasi / $grandPagu) * 100 : 0;
+
+        // Siapkan array ringkas untuk grand total
+        $grandTotal = [
+            'pagu' => $grandPagu, // dari hitungan variabel index abang
+            'realisasi' => $grandRealisasi,
+            'sisa' => $grandSisa,
+            'persen' => $grandPersen
+        ];
+
+        $filename = 'LRA_DPMPTSP_' . $jenisLra . '_' . date('Ymd') . '.xlsx';
+
+        if (ob_get_contents()) ob_end_clean();
+        return Excel::download(new LraExport($processedData, $endDate, $jenisLra, $tahun, $grandTotal), $filename);
     }
 }

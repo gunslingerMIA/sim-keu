@@ -6,12 +6,13 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColumnWidths
+class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColumnWidths, WithCustomStartCell
 {
     protected $mutations, $saldoAwal, $start, $end, $accountName;
 
@@ -24,39 +25,45 @@ class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColu
         $this->accountName = $accountName;
     }
 
+    public function startCell(): string
+    {
+        return 'A5';
+    }
+
     public function collection()
     {
         $data = collect();
 
-        // Baris Kosong Kompensasi Judul Atas
-        $data->push(['', '', '', '', '', '']);
-        $data->push(['', '', '', '', '', '']);
-        $data->push(['', '', '', '', '', '']);
+        // 1. Berikan 4 baris kosong untuk area penulisan Judul (A1 s.d A4)
+        // Headings bawaan Laravel Excel nantinya otomatis menempati Baris ke-5
+       
 
-        // Baris 4: Saldo Awal Sebelum Periode
+        // 2. Baris ke-6: Menampilkan Data Saldo Awal Sebelum Periode
         $data->push([
             '-',
             'SALDO AWAL SEBELUM PERIODE',
             '-',
-            '-',
-            '-',
+            0,
+            0,
             $this->saldoAwal
         ]);
 
-        // Baris 5 dan seterusnya: Loop Data Mutasi Jurnal
-        $currentSaldoRow = 4; // Baris saldo awal di excel nanti ada di baris ke-4 (karena offset judul)
+        // 3. Baris ke-7 dan seterusnya: Mengisi Baris Mutasi Transaksi
+        // Karena Saldo Awal berada di baris 6, posisi indeks awal disetel tepat ke angka 6
+        $currentSaldoRow = 6; 
+        
         foreach ($this->mutations as $m) {
             $currentSaldoRow++;
-            $isDebit = $m->account_debit == $m->selected_account_id; // Dilempar dari controller
+            $isDebit = $m->account_debit == $m->selected_account_id;
             $debit = $isDebit ? $m->jumlah : 0;
             $kredit = !$isDebit ? $m->jumlah : 0;
             
-            // Formula matematika Excel otomatis: Saldo Sebelumnya + Debit - Kredit
+            // Formula matematika Excel: Saldo Baris Sebelumnya + Debit Saat Ini - Kredit Saat Ini
             $formulaSaldo = "=F" . ($currentSaldoRow - 1) . "+D" . $currentSaldoRow . "-E" . $currentSaldoRow;
 
             $data->push([
-                date('d/m/Y', strtotime($m->tanggal)) . " (" . $m->pkjur . ")",
-                $m->keterangan . " [Lawan: " . ($isDebit ? $m->kreditAccount->nama_rekening : $m->debitAccount->nama_rekening) . "]",
+                date('d/m/Y', strtotime($m->tanggal)),
+                $m->keterangan . " [Lawan: " . ($isDebit ? ($m->kreditAccount->nama_rekening ?? 'N/A') : ($m->debitAccount->nama_rekening ?? 'N/A')) . "]",
                 $m->nobukti,
                 $debit > 0 ? $debit : 0,
                 $kredit > 0 ? $kredit : 0,
@@ -82,7 +89,7 @@ class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColu
     public function columnWidths(): array
     {
         return [
-            'A' => 16,
+            'A' => 18,
             'B' => 55,
             'C' => 15,
             'D' => 18,
@@ -93,10 +100,9 @@ class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColu
 
     public function styles(Worksheet $sheet)
     {
-        // 1. Ambil Baris Terakhir Data
         $highestRow = $sheet->getHighestRow();
 
-        // 2. Tulis KOP JUDUL LAPORAN langsung di posisi baris yang benar (Baris 1, 2, 3)
+        // Tulis Teks Judul Utama di Baris 1-3 yang dikompensasi kosong tadi
         $sheet->setCellValue('A1', 'BUKU BESAR AKUN');
         $sheet->mergeCells('A1:F1');
         $sheet->getStyle('A1')->getFont()->setSize(14)->setBold(true);
@@ -112,14 +118,16 @@ class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColu
         $sheet->getStyle('A3')->getFont()->setSize(10)->setItalic(true);
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // --- HAPUS BARIS $sheet->moveRow(1, 5); YANG ERROR TADI ---
-
-        // 3. Desain Table Head yang sekarang otomatis berada di Baris 5
+        // // Desain Table Head (Baris 5)
         $sheet->getStyle('A5:F5')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
         $sheet->getStyle('A5:F5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('2F4F4F');
         $sheet->getStyle('A5:F5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 4. Atur Format Desain Angka Mata Uang & Border untuk Semua Baris Data
+        // Desain Baris Khusus Saldo Awal (Baris 6) agar terlihat menonjol
+        $sheet->getStyle('A6:F6')->getFont()->setBold(true);
+        $sheet->getStyle('A6:F6')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F8F9FA');
+
+        // Atur Garis Kotak Border & Penyelarasan Posisi Teks Kolom
         $styleArray = [
             'borders' => [
                 'allBorders' => [
@@ -129,10 +137,14 @@ class LedgerExport implements FromCollection, WithStyles, WithHeadings, WithColu
             ],
         ];
         $sheet->getStyle("A5:F{$highestRow}")->applyFromArray($styleArray);
+        
+        // Perataan teks kolom tengah dan atas agar rapi jika uraiannya panjang (wrap)
+        $sheet->getStyle("A5:F{$highestRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
         $sheet->getStyle("A6:A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("C6:C{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("B6:B{$highestRow}")->getAlignment()->setWrapText(true);
 
-        // Format Angka Rupiah Akuntansi Tanpa Desimal untuk Kolom D, E, F
+        // Penerapan Format Rupiah Akuntansi Tanpa Desimal (Kolom D=Debit, E=Kredit, F=Saldo)
         $sheet->getStyle("D6:F{$highestRow}")->getNumberFormat()->setFormatCode('"Rp "#,##0;[Red]("-Rp "#,##0);"-"');
 
         return [];

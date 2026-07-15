@@ -197,7 +197,7 @@
                               User
                             </a>
                             <a href="{{ route('years.index') }}" class="nav-link {{ request()->routeIs('years.*') ? 'active' : '' }}">
-                                <i class="bi bi-calendar-plus me-1 small"></i>Tahun Anggaran
+                               Tahun Anggaran
                             </a>
                         @endif
                     </div>

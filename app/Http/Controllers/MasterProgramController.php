@@ -175,7 +175,12 @@ class MasterProgramController extends Controller
 
     public function deleteSubActivity($id)
     {
-        $subActivity = \App\Models\SubActivity::findOrFail($id);
+        $subActivity = \App\Models\SubActivity::withCount(['budgets', 'transactions'])->findOrFail($id);
+
+        if ($subActivity->budgets_count > 0 || $subActivity->transactions_count > 0) {
+            return back()->with('error', 'Sub-Kegiatan tidak dapat dihapus karena sudah memiliki rincian DPA atau transaksi terkait!');
+        }
+
         $subActivity->delete(); 
         return back()->with('success', 'Sub-Kegiatan berhasil dihapus');
     }

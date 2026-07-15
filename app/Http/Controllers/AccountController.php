@@ -60,8 +60,13 @@ class AccountController extends Controller
 
     public function delete($id)
     {
-        $account = Account::findOrFail($id);
-        $account->delete($id);
+        $account = Account::withCount(['budgets', 'transactionsAsDebit', 'transactionsAsKredit'])->findOrFail($id);
+
+        if ($account->budgets_count > 0 || $account->transactions_as_debit_count > 0 || $account->transactions_as_kredit_count > 0) {
+            return back()->with('error', 'Akun/Rekening tidak dapat dihapus karena sudah digunakan dalam DPA atau transaksi terkait!');
+        }
+
+        $account->delete();
 
         return back()->with('success', 'Akun berhasil dihapus');
     }

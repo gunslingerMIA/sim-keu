@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    protected $fillable = ['pkjur', 'tanggal', 'nobukti', 'keterangan', 'account_debit', 'account_kredit', 'sub_activity_id', 'jumlah'];
+    protected $fillable = ['pkjur', 'type', 'tanggal', 'nobukti', 'keterangan', 'account_debit', 'account_kredit', 'sub_activity_id', 'jumlah'];
     //
     // app/Models/Transaction.php
 

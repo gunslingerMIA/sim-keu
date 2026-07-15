@@ -7,13 +7,98 @@
                 <div>
                     <h2 class="page-title text-primary">Struktur DPA SKPD</h2>
                     <small class="text-success fw-bold">
-                        <i class="bi bi-calendar3 me-1"></i> Tahun Anggaran: {{ session('tahun_anggaran') }}
+                        <i class="bi bi-calendar3 me-1"></i> Tahun Anggaran: {{ session('tahun_anggaran') }} —
                         {{ session('nama_tahapan') }}
+                        @if ($stageAktif && $stageAktif->is_locked)
+                            <span class="badge bg-secondary-lt text-secondary ms-1"><i class="bi bi-lock-fill me-1"></i>Terkunci</span>
+                        @else
+                            <span class="badge bg-success-lt text-success ms-1"><i class="bi bi-unlock-fill me-1"></i>Bisa diedit</span>
+                        @endif
                     </small>
+                    <div class="mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#riwayatTahapanModal" class="small">
+                            Riwayat tahapan ({{ $riwayatTahapan->count() }})
+                        </a>
+                        &middot;
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#tambahTahapanModal" class="small text-primary fw-bold">
+                            <i class="bi bi-plus-circle me-1"></i>Tambah Tahapan
+                        </a>
+                    </div>
                 </div>
                 <div class="text-end">
                     <div class="text-muted small text-uppercase">Total Pagu Perangkat Daerah</div>
                     <div class="h2 fw-bold text-azure">Rp {{ number_format($programs->sum('total_pagu'), 0, ',', '.') }}
+                    </div>
+                </div>
+            </div>
+
+            {{-- MODAL: Tambah Tahapan --}}
+            <div class="modal modal-blur fade" id="tambahTahapanModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <form action="{{ route('stages.store') }}" method="POST">
+                            @csrf
+                            <div class="modal-header">
+                                <h5 class="modal-title">Tambah Tahapan APBD</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-secondary">
+                                    Tahapan saat ini: <strong>{{ session('nama_tahapan') }}</strong>.
+                                    Membuat tahapan baru akan <strong>menyalin seluruh pagu</strong> dari tahapan ini,
+                                    lalu <strong>mengunci</strong> tahapan saat ini sehingga tidak bisa diedit lagi.
+                                </p>
+                                <div class="mb-3">
+                                    <label class="form-label">Nama Tahapan Baru</label>
+                                    <input type="text" name="nama_tahapan" class="form-control" list="saranTahapan"
+                                        placeholder="Contoh: Perubahan Sebelum Perubahan" required>
+                                    <datalist id="saranTahapan">
+                                        <option value="Perubahan Sebelum Perubahan">
+                                        <option value="Perubahan APBD">
+                                        <option value="Perubahan Setelah Perubahan">
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Buat Tahapan & Salin Pagu</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {{-- MODAL: Riwayat Tahapan --}}
+            <div class="modal modal-blur fade" id="riwayatTahapanModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Riwayat Tahapan {{ session('tahun_anggaran') }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="list-group">
+                                @foreach ($riwayatTahapan as $st)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ $st->urutan }}. {{ $st->nama_tahapan }}</span>
+                                        <span>
+                                            @if ($st->is_locked)
+                                                <span class="badge bg-secondary-lt text-secondary"><i class="bi bi-lock-fill me-1"></i>Terkunci</span>
+                                            @else
+                                                <span class="badge bg-success-lt text-success"><i class="bi bi-unlock-fill me-1"></i>Aktif</span>
+                                            @endif
+                                            @if ($st->id != session('active_stage_id'))
+                                                <form action="{{ route('stages.set-active', $st->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-sm btn-white ms-1">Lihat</button>
+                                                </form>
+                                            @endif
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

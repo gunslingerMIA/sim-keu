@@ -14,6 +14,9 @@
                     <h4 class="mt-2 text-azure">
                         <i class="bi bi-wallet2 me-2"></i> {{ $subActivity->kode_sub_kegiatan }}
                         {{ $subActivity->nama_sub_kegiatan }}
+                        @if ($stageAktif && $stageAktif->is_locked)
+                            <span class="badge bg-secondary-lt text-secondary ms-1"><i class="bi bi-lock-fill me-1"></i>Tahapan Terkunci</span>
+                        @endif
                     </h4>
                 </div>
             </div>
@@ -26,6 +29,13 @@
                         </div>
                         <div class="card-body">
 
+                            @if ($stageAktif && $stageAktif->is_locked)
+                                <div class="alert alert-secondary mb-0">
+                                    <i class="bi bi-lock-fill me-1"></i>
+                                    Tahapan <strong>{{ $stageAktif->nama_tahapan }}</strong> sudah terkunci.
+                                    Buka tahapan terbaru untuk mengubah pagu.
+                                </div>
+                            @else
                             <form action="{{ route('budgets.store') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="sub_activity_id" value="{{ $subActivity->id }}">
@@ -50,6 +60,7 @@
                                     <i class="bi bi-save me-2"></i> Simpan ke DPA
                                 </button>
                             </form>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -77,10 +88,12 @@
                                                 {{ number_format($b->nominal, 0, ',', '.') }}
                                             </td>
                                             <td>
-                                                <button class="btn btn-icon btn-ghost-danger btn-sm"
-                                                    onclick="confirmDeleteBudget('/budgets/delete/{{ $b->id }}')">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                                @if (!($stageAktif && $stageAktif->is_locked))
+                                                    <button class="btn btn-icon btn-ghost-danger btn-sm"
+                                                        onclick="confirmDeleteBudget('/budgets/delete/{{ $b->id }}')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                         @php $total += $b->nominal; @endphp

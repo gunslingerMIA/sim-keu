@@ -16,9 +16,13 @@ class DashboardController extends Controller
     {
         // Mengambil tahun dari session atau default tahun sekarang
         $tahun = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
 
-        // 1. Ambil Total Pagu (Langsung dari database)
-        $totalPagu = \App\Models\Budget::where('tahun', $tahun)->sum('nominal');
+        // 1. Ambil Total Pagu (Langsung dari database) — HARUS difilter per tahapan aktif,
+        //    kalau tidak, pagu tahapan lama yang sudah dikunci ikut kehitung dan jadi dobel.
+        $totalPagu = \App\Models\Budget::where('tahun', $tahun)
+            ->where('stage_id', $tahapan)
+            ->sum('nominal');
 
         // 2. Ambil Total Realisasi
         // Kita filter hanya transaksi yang memiliki sub_activity_id (artinya transaksi belanja/kegiatan)
@@ -33,9 +37,11 @@ class DashboardController extends Controller
         // 4. Data Program (Gunakan withSum agar database yang menghitung, bukan PHP)
         // Ini jauh lebih cepat daripada flatMap
         $programs = \App\Models\Program::where('tahun', $tahun)
-            ->with(['activities.subActivities' => function($query) {
+            ->with(['activities.subActivities' => function($query) use ($tahun, $tahapan) {
                 // Kita ambil sub_activity sekaligus total budget dan total transaksi-nya
-                $query->withSum('budgets as total_pagu', 'nominal')
+                $query->withSum(['budgets as total_pagu' => function($q) use ($tahun, $tahapan) {
+                        $q->where('tahun', $tahun)->where('stage_id', $tahapan);
+                    }], 'nominal')
                     ->withSum('transactions as total_realisasi', 'jumlah');
             }])
             ->get()

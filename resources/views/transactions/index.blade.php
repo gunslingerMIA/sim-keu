@@ -112,6 +112,7 @@
                                         <button class="btn btn-sm btn-warning" onclick="openEditModal(this)"
                                             data-id="{{ $t->id }}" data-tanggal="{{ $t->tanggal }}"
                                             data-nobukti="{{ $t->nobukti }}" data-keterangan="{{ $t->keterangan }}"
+                                            data-type="{{ $t->type }}"
                                             data-debit_id="{{ $t->account_debit }}"
                                             data-kredit_id="{{ $t->account_kredit }}"
                                             data-sub_id="{{ $t->sub_activity_id }}" data-jumlah="{{ $t->jumlah }}"
@@ -185,7 +186,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Nominal</label>
+                            <label class="form-label fw-bold">Jenis Jurnal</label>
+                            <select class="form-select" name="type" id="edit_type">
+                                <option value="JKK">Jurnal Kas Keluar (JKK)</option>
+                                <option value="JKM" >Jurnal Kas Masuk (JKM)</option>
+                                <option value="JAK" >Jurnal Antar Kas (JAK)</option>
+                                <option value="JU" >Jurnal Umum (JU)</option>
+                            </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nominal</label> 
                         <input type="number" name="amount" id="edit_jumlah" class="form-control">
                     </div>
 
@@ -292,6 +303,8 @@
             // 2. Isi Input
             document.getElementById('edit_nobukti').value = data.nobukti;
             document.getElementById('edit_tanggal').value = data.tanggal;
+            document.getElementById('edit_type').value = data.type;
+            console.log(data.nobukti);
             document.getElementById('edit_jumlah').value = data.jumlah;
             document.getElementById('edit_keterangan').value = data.keterangan;
 

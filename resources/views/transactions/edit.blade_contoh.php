@@ -10,6 +10,7 @@
             <label class="form-label">Tanggal</label>
             <input type="date" name="tanggal" class="form-control" value="{{ $transaction->tanggal }}">
         </div>
+        
         <div class="col-md-6 mb-3">
             <label class="form-label">No. Bukti</label>
             <input type="text" name="nobukti" class="form-control" value="{{ $transaction->nobukti }}">

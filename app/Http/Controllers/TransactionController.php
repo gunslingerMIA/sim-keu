@@ -124,9 +124,11 @@ class TransactionController extends Controller
         // 3. CEK PAGU (Hanya jika ada Sub Kegiatan / Transaksi Belanja)
         if ($request->sub_activity_id) {
 
-            // Cari Pagu di DPA
+            // Cari Pagu di DPA — HARUS sesuai tahapan aktif, kalau tidak bisa kepilih pagu
+            // dari tahapan lama yang sudah terkunci/sudah tidak berlaku.
             $pagu = \App\Models\Budget::where('sub_activity_id', $request->sub_activity_id)
                 ->where('account_id', $request->debit_account_id)
+                ->where('stage_id', session('active_stage_id'))
                 ->first();
 
             if (!$pagu) {
@@ -150,6 +152,7 @@ class TransactionController extends Controller
             // 4. Proses Simpan
             \App\Models\Transaction::create([
                 'pkjur'           => 'B' . date('ymdHis') . rand(10, 99), // Tambah random biar gak bentrok jika input cepat
+                'type'            => $request->type,
                 'tanggal'         => $request->tanggal,
                 'nobukti'         => $request->nobukti,
                 'keterangan'      => $request->keterangan,
@@ -208,7 +211,12 @@ class TransactionController extends Controller
         if ($request->sub_activity_id) {
             $pagu = \App\Models\Budget::where('sub_activity_id', $request->sub_activity_id)
                 ->where('account_id', $request->debit_account_id)
+                ->where('stage_id', session('active_stage_id'))
                 ->first();
+
+            if (!$pagu) {
+                return back()->withInput()->with('error', 'Rekening ini tidak memiliki anggaran (Pagu) di DPA untuk tahapan aktif saat ini!');
+            }
 
             // Hitung realisasi transaksi LAIN (kecuali transaksi yang sedang diedit ini)
             $realisasiLain = \App\Models\Transaction::where('sub_activity_id', $request->sub_activity_id)
@@ -222,9 +230,9 @@ class TransactionController extends Controller
                 return back()->withInput()->with('error', "Update Gagal! Total belanja melebihi sisa pagu.");
             }
         }
-
         $transaction->update([
             'tanggal'         => $request->tanggal,
+            'type'            => $request->type,
             'nobukti'         => $request->nobukti,
             'keterangan'      => $request->keterangan,
             'account_debit'   => $request->debit_account_id,

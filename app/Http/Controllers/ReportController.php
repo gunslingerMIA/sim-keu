@@ -44,10 +44,13 @@ class ReportController extends Controller
     public function ledgerIndex(Request $request)
     {
         $tahun = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
 
-        // 1. Ambil data untuk Pilihan Modal Search (Tetap seperti kode Abang)
+        // 1. Ambil data untuk Pilihan Modal Search — difilter tahapan aktif juga,
+        //    supaya rekening yang sama tidak muncul dobel (dari tahapan lama & baru).
         $budgetData = \App\Models\Budget::with(['account', 'subActivity'])
             ->where('tahun', $tahun)
+            ->where('stage_id', $tahapan)
             ->get()
             ->sortBy('subActivity.kode_sub_kegiatan')
             ->map(function ($b) {
@@ -225,6 +228,7 @@ class ReportController extends Controller
     {
         // Logika untuk menampilkan halaman laporan LRA
         $tahunAnggaran = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
 
         //filter parameter
         $end = $request->get('end_date', $tahunAnggaran . '-12-31'); //
@@ -234,8 +238,8 @@ class ReportController extends Controller
         //ambil struktur program sampai budget
         $programs = \App\Models\Program::where('tahun', $tahunAnggaran)
             ->with([
-                'activities.subActivities.budgets' => function ($query) use ($tahunAnggaran) {
-                    $query->where('tahun', $tahunAnggaran)->with('account');
+                'activities.subActivities.budgets' => function ($query) use ($tahunAnggaran, $tahapan) {
+                    $query->where('tahun', $tahunAnggaran)->where('stage_id', $tahapan)->with('account');
                 }
             ])
             ->get();
@@ -309,14 +313,15 @@ class ReportController extends Controller
     public function lraExport(Request $request)
     {
         $tahun = session('tahun_anggaran', date('Y'));
+        $tahapan = session('active_stage_id');
         $endDate = $request->get('end_date', $tahun . '-12-31');
         $jenisLra = $request->get('jenis_lra', 'ringkas');
 
         // Ambil raw data yang sama dari logic index LRA Abang sebelumnya
         $programs = \App\Models\Program::where('tahun', $tahun)
             ->with([
-                'activities.subActivities.budgets' => function ($query) use ($tahun) {
-                    $query->where('tahun', $tahun)->with('account');
+                'activities.subActivities.budgets' => function ($query) use ($tahun, $tahapan) {
+                    $query->where('tahun', $tahun)->where('stage_id', $tahapan)->with('account');
                 }
             ])
             ->get();

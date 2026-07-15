@@ -14,33 +14,9 @@ use App\Models\Transaction;
 class BudgetController extends Controller
 {
     // Menampilkan daftar pagu per Sub-Kegiatan
-
-    public function gantiTahapan(Request $request) {
-        $tahapBaru = $request->tahap_baru; // Contoh: 'geser_awal'
-        $tahapLama = $request->tahap_lama; // Contoh: 'murni'
-
-        // 1. Salin semua data dari tahap lama ke tahap baru
-        $dataLama = Budget::where('tahapan', $tahapLama)->get();
-        foreach($dataLama as $d) {
-            Budget::create([
-                'sub_activity_id' => $d->sub_activity_id,
-                'account_id' => $d->account_id,
-                'nominal' => $d->nominal,
-                'tahapan' => $tahapBaru,
-                'tahun' => $d->tahun
-            ]);
-        }
-
-        // 2. Update Saklar Global di AppSetting
-        \App\Models\AppSetting::where('key', 'tahapan_aktif')->update([
-            'value' => $tahapBaru,
-            'label' => $request->label_baru
-        ]);
-
-        return back()->with('success', 'Tahapan berhasil dikunci dan lanjut ke tahap berikutnya!');
-    }
-
-   
+    // NOTE: gantiTahapan() & replicate() lama dihapus dari sini — kolom 'tahapan'
+    // yang dipakainya tidak pernah ada di tabel budgets (yang ada stage_id).
+    // Fungsinya sekarang digantikan oleh StagesController::store().
 
     public function index()
     {
@@ -79,7 +55,10 @@ class BudgetController extends Controller
                 return $program;
             });
 
-        return view('budgets.index', compact('programs'));
+        $stageAktif = Stage::find($tahapan);
+        $riwayatTahapan = Stage::where('tahun', $tahun)->orderBy('urutan')->get();
+
+        return view('budgets.index', compact('programs', 'stageAktif', 'riwayatTahapan'));
     }
 
     public function rincian($sub_id)
@@ -88,8 +67,12 @@ class BudgetController extends Controller
         $accounts = Account::all();
         $budgets = Budget::where('sub_activity_id', $sub_id)
                         ->where('tahun', session('tahun_anggaran', date('Y')))
+                        ->where('stage_id', session('active_stage_id'))
                         ->get();
-        return view('budgets.rinci', compact('subActivity', 'accounts', 'budgets'));
+
+        $stageAktif = Stage::find(session('active_stage_id'));
+
+        return view('budgets.rinci', compact('subActivity', 'accounts', 'budgets', 'stageAktif'));
     }
 
     // Simpan atau Update Rincian Pagu
@@ -114,6 +97,11 @@ class BudgetController extends Controller
             }
         }
 
+        $stage = Stage::find($stage_id);
+        if ($stage && $stage->is_locked) {
+            return back()->with('error', "Tahapan '{$stage->nama_tahapan}' sudah terkunci dan tidak bisa diubah lagi.");
+        }
+
         // Gunakan updateOrCreate untuk mencegah duplikasi rekening di sub kegiatan yang sama
         Budget::updateOrCreate(
             [
@@ -133,6 +121,12 @@ class BudgetController extends Controller
     public function delete($id)
     {
          $budget = Budget::findOrFail($id);
+
+        $stage = Stage::find($budget->stage_id);
+        if ($stage && $stage->is_locked) {
+            return back()->with('error', "Tahapan '{$stage->nama_tahapan}' sudah terkunci, rincian anggaran tidak bisa dihapus.");
+        }
+
         //cek apakah ada transaksi
         $adaTransaksi = Transaction::where('sub_activity_id', $budget->sub_activity_id)
                                     ->where('account_debit', $budget->account_id)
@@ -144,38 +138,5 @@ class BudgetController extends Controller
         $budget->delete();
 
         return back()->with('success', 'Rincian anggaran berhasil dihapus.');
-    }
-
-    // Fungsi Sakti: Salin data dari tahapan sebelumnya
-    public function replicate(Request $request)
-    {
-        $target = $request->tahapan_tujuan; // misal: geser_awal
-        $source = $request->tahapan_asal;   // misal: murni
-        $sub_id = $request->sub_activity_id;
-
-        $sourceData = Budget::where('sub_activity_id', $sub_id)
-                            ->where('tahapan', $source)
-                            ->get();
-
-        if ($sourceData->isEmpty()) {
-            return back()->with('error', "Data pada tahapan $source tidak ditemukan!");
-        }
-
-        foreach ($sourceData as $data) {
-            Budget::updateOrCreate(
-                [
-                    'sub_activity_id' => $sub_id,
-                    'account_id' => $data->account_id,
-                    'tahapan' => $target,
-                    'tahun' => $data->tahun,
-                ],
-                [
-                    'nominal' => $data->nominal,
-                    'dasar_hukum' => "Salinan dari $source",
-                ]
-            );
-        }
-
-        return back()->with('success', "Berhasil menyalin data dari $source ke $target");
     }
 }

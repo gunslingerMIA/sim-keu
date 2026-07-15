@@ -9,6 +9,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StagesController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -44,10 +45,13 @@ Route::middleware('auth')->group(function () {
     Route::prefix('budgets')->group(function () {
         Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
         Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
-        Route::post('/replicate', [BudgetController::class, 'replicate'])->name('budgets.replicate');
-        // Route::post('/ganti-tahapan', [BudgetController::class, 'gantiTahapan'])->name('budgets.ganti-tahapan');
         Route::get('/rinci/{sub_id}', [BudgetController::class, 'rincian'])->name('budgets.rinci');
         Route::get('/delete/{id}', [BudgetController::class, 'delete'])->name('budgets.delete');
+    });
+
+    Route::prefix('stages')->group(function () {
+        Route::post('/store', [StagesController::class, 'store'])->name('stages.store');
+        Route::put('/set-active/{id}', [StagesController::class, 'setActive'])->name('stages.set-active');
     });
 
     Route::prefix('transactions')->group(function (){
@@ -91,11 +95,3 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-sub-activities/{activityId}', [TransactionController::class, 'getSubActivities']);
 
 });
-
-
-
-
-
-
-
-

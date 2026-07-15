@@ -63,10 +63,11 @@ class BudgetController extends Controller
 
     public function rincian($sub_id)
     {
+        $tahun = session('tahun_anggaran', date('Y'));
         $subActivity = SubActivity::with(['budgets.account'])->findOrFail($sub_id);
-        $accounts = Account::all();
+        $accounts = Account::where('tahun', $tahun)->get();
         $budgets = Budget::where('sub_activity_id', $sub_id)
-                        ->where('tahun', session('tahun_anggaran', date('Y')))
+                        ->where('tahun', $tahun)
                         ->where('stage_id', session('active_stage_id'))
                         ->get();
 

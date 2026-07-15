@@ -83,9 +83,9 @@
                         <div class="mb-3">
                             <label class="form-label">Role</label>
                             <select name="role" id="role" class="form-control">
-                                <option value="Bendahara">Bendahara</option>
-                                <option value="Admin">Admin</option>
-                                <option value="Bendahara">Kasir</option>
+                                <option value="bendahara">Bendahara</option>
+                                <option value="admin">Admin</option>
+                                <option value="kasir">Kasir</option>
                             </select>
                         </div>
                     </div>

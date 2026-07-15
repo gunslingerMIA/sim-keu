@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    Route::prefix('accounts')->group(function(){
+    Route::prefix('accounts')->middleware('role:admin,bendahara')->group(function(){
         Route::get('/', [AccountController::class, 'index'])->name('accounts.index');
         Route::post('/store', [AccountController::class, 'store'])->name('accounts.store');
         Route::put('/update/{id}', [AccountController::class, 'update'])->name('accounts.update');
@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
     });
     
 
-    Route::prefix('programs')->group(function () {
+    Route::prefix('programs')->middleware('role:admin')->group(function () {
         Route::get('/', [MasterProgramController::class, 'index'])->name('programs.index');
         Route::post('/store', [MasterProgramController::class, 'storeProgram'])->name('programs.store');
         Route::put('/update/{id}', [MasterProgramController::class, 'updateProgram']);
@@ -43,24 +43,24 @@ Route::middleware('auth')->group(function () {
         
     });
 
-    Route::prefix('budgets')->group(function () {
+    Route::prefix('budgets')->middleware('role:admin,bendahara')->group(function () {
         Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
         Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
         Route::get('/rinci/{sub_id}', [BudgetController::class, 'rincian'])->name('budgets.rinci');
         Route::get('/delete/{id}', [BudgetController::class, 'delete'])->name('budgets.delete');
     });
 
-    Route::prefix('stages')->group(function () {
+    Route::prefix('stages')->middleware('role:admin,bendahara')->group(function () {
         Route::post('/store', [StagesController::class, 'store'])->name('stages.store');
         Route::put('/set-active/{id}', [StagesController::class, 'setActive'])->name('stages.set-active');
     });
 
-    Route::prefix('years')->group(function () {
+    Route::prefix('years')->middleware('role:admin')->group(function () {
         Route::get('/', [YearController::class, 'index'])->name('years.index');
         Route::post('/store', [YearController::class, 'store'])->name('years.store');
     });
 
-    Route::prefix('transactions')->group(function (){
+    Route::prefix('transactions')->middleware('role:admin,bendahara')->group(function (){
         Route::get('/', [TransactionController::class, 'index'])->name('transactions.index');
         // Rute untuk menampilkan halaman Form Input
         Route::get('/add', [TransactionController::class, 'add'])->name('transactions.add');
@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/delete/{id}', [TransactionController::class, 'delete'])->name('transactions.delete');
     });
 
-    Route::prefix('users')->group(function(){
+    Route::prefix('users')->middleware('role:admin')->group(function(){
         Route::get('/', [UserController::class, 'index'])->name('users.index');
         Route::post('/store', [UserController::class, 'store'])->name('users.store');
         Route::get('/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
@@ -83,14 +83,18 @@ Route::middleware('auth')->group(function () {
         Route::put('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.reset-password');
     });
     Route::prefix('reports')->group(function(){
-        Route::get('/journal', [ReportController::class, 'journalIndex'])->name('reports.journal');
-        Route::get('/journal/print', [ReportController::class, 'journalPrint'])->name('reports.journal.print');
-        Route::get('/reports/journal/export', [ReportController::class, 'journalExport'])->name('reports.journal.export');
-        Route::get('/ledger', [ReportController::class, 'ledgerIndex'])->name('reports.ledger');
-        Route::get('/ledger/export', [ReportController::class, 'ledgerExport'])->name('reports.ledger.export');
+        Route::middleware('role:admin,bendahara')->group(function() {
+            Route::get('/journal', [ReportController::class, 'journalIndex'])->name('reports.journal');
+            Route::get('/journal/print', [ReportController::class, 'journalPrint'])->name('reports.journal.print');
+            Route::get('/reports/journal/export', [ReportController::class, 'journalExport'])->name('reports.journal.export');
+            Route::get('/ledger', [ReportController::class, 'ledgerIndex'])->name('reports.ledger');
+            Route::get('/ledger/export', [ReportController::class, 'ledgerExport'])->name('reports.ledger.export');
+        });
 
-        Route::get('/lra', [ReportController::class, 'lraIndex'])->name('reports.lra');
-        Route::get('/lra/export', [ReportController::class, 'lraExport'])->name('reports.lra.export');
+        Route::middleware('role:admin,bendahara,kasir')->group(function() {
+            Route::get('/lra', [ReportController::class, 'lraIndex'])->name('reports.lra');
+            Route::get('/lra/export', [ReportController::class, 'lraExport'])->name('reports.lra.export');
+        });
     });
 
 

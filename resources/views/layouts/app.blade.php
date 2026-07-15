@@ -166,39 +166,49 @@
             </div>
 
 
+            @php
+                $userRole = strtolower(auth()->user()->role);
+            @endphp
+
             <div class="mt-2 flex-grow-1">
                 <a class="nav-link {{ request()->is('dashboard') || request()->is('/') ? 'active' : '' }}"
                     href="/dashboard">
                     <i class="bi bi-grid-1x2-fill"></i> Dashboard
                 </a>
 
-                <div class="menu-header">Data Master</div>
+                @if($userRole === 'admin' || $userRole === 'bendahara')
+                    <div class="menu-header">Data Master</div>
 
-                <a href="#pengaturan" class="nav-link {{ request()->routeIs(['programs.*', 'budgets.*', 'accounts.*', 'users.*', 'years.*']) ? 'active' : '' }}" data-bs-toggle="collapse"><i class="bi bi-gear"></i>Setting Data</a>
-                <div class="collapse" id="pengaturan">
-                    <a href="/programs" class="nav-link {{ request()->is('programs') ? 'active' : '' }}">
-                        Program Kegiatan
-                    </a>
-                    <a href="/accounts" class="nav-link {{ request()->is('accounts') ? 'active' : '' }}">
-                       Akun
-                    </a>
-                    <a href="/budgets" class="nav-link {{ request()->is('budgets') ? 'active' : '' }}">
-                      DPA
-                    </a>
-                    <a href="/users" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
-                      User
-                    </a>
-                    <a href="{{ route('years.index') }}" class="nav-link {{ request()->routeIs('years.*') ? 'active' : '' }}">
-                        <i class="bi bi-calendar-plus me-1 small"></i>Tahun Anggaran
-                    </a>
-                </div>
+                    <a href="#pengaturan" class="nav-link {{ request()->routeIs(['programs.*', 'budgets.*', 'accounts.*', 'users.*', 'years.*']) ? 'active' : '' }}" data-bs-toggle="collapse"><i class="bi bi-gear"></i>Setting Data</a>
+                    <div class="collapse" id="pengaturan">
+                        @if($userRole === 'admin')
+                            <a href="/programs" class="nav-link {{ request()->is('programs') ? 'active' : '' }}">
+                                Program Kegiatan
+                            </a>
+                        @endif
+                        <a href="/accounts" class="nav-link {{ request()->is('accounts') ? 'active' : '' }}">
+                           Akun
+                        </a>
+                        <a href="/budgets" class="nav-link {{ request()->is('budgets') ? 'active' : '' }}">
+                          DPA
+                        </a>
+                        @if($userRole === 'admin')
+                            <a href="/users" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
+                              User
+                            </a>
+                            <a href="{{ route('years.index') }}" class="nav-link {{ request()->routeIs('years.*') ? 'active' : '' }}">
+                                <i class="bi bi-calendar-plus me-1 small"></i>Tahun Anggaran
+                            </a>
+                        @endif
+                    </div>
+                @endif
 
-
-
-                <div class="menu-header">Transaksi</div>
-                <a class="nav-link {{ request()->routeIs('transactions.*') ? 'active' : '' }}" href="/transactions">
-                    <i class="bi bi-pencil-square"></i> Jurnal
-                </a>
+                @if($userRole === 'admin' || $userRole === 'bendahara')
+                    <div class="menu-header">Transaksi</div>
+                    <a class="nav-link {{ request()->routeIs('transactions.*') ? 'active' : '' }}" href="/transactions">
+                        <i class="bi bi-pencil-square"></i> Jurnal
+                    </a>
+                @endif
 
                 <div class="menu-header">Pelaporan</div>
                 <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs(['reports.*']) ? 'active' : '' }}" data-bs-toggle="collapse"
@@ -206,8 +216,10 @@
                     <span><i class="bi bi-journal-text small"></i> Laporan</span>
                 </a>
                 <div class="collapse " id="laporanSub">
-                    <a href="/reports/journal" class="nav-link ps-5 small {{ request()->routeIs(['reports.journal']) ? 'active' : '' }}">Jurnal Transaksi</a>
-                    <a href="/reports/ledger" class="nav-link ps-5 small {{ request()->routeIs(['reports.ledger']) ? 'active' : '' }}">Buku Besar Akun</a>
+                    @if($userRole === 'admin' || $userRole === 'bendahara')
+                        <a href="/reports/journal" class="nav-link ps-5 small {{ request()->routeIs(['reports.journal']) ? 'active' : '' }}">Jurnal Transaksi</a>
+                        <a href="/reports/ledger" class="nav-link ps-5 small {{ request()->routeIs(['reports.ledger']) ? 'active' : '' }}">Buku Besar Akun</a>
+                    @endif
                     <a href="/reports/lra" class="nav-link ps-5 small {{ request()->routeIs(['reports.lra']) ? 'active' : '' }}">Neraca Saldo</a>
                 </div>
             </div>

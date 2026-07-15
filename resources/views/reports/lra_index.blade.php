@@ -16,6 +16,16 @@
                 vertical-align: middle;
             }
 
+            .row-dinas {
+                background-color: #2c3e50 !important;
+                color: #ffffff !important;
+                font-weight: bold;
+            }
+
+            .row-dinas td {
+                color: #ffffff !important;
+            }
+
             .row-program {
                 background-color: #e9ecef !important;
                 font-weight: bold;
@@ -143,6 +153,17 @@
                     print-color-adjust: exact !important;
                 }
 
+                .row-dinas {
+                    background-color: #2c3e50 !important;
+                    color: #ffffff !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                .row-dinas td {
+                    color: #ffffff !important;
+                }
+
                 .row-program {
                     background-color: #e9ecef !important;
                     -webkit-print-color-adjust: exact !important;
@@ -247,6 +268,17 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @if($processedData->isNotEmpty())
+                                    {{-- LEVEL 0: SKPD / DINAS --}}
+                                    <tr class="row-dinas">
+                                        <td colspan="2">Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu</td>
+                                        <td class="text-end">Rp {{ number_format($grandPagu, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format($grandRealisasi, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format($grandSisa, 0, ',', '.') }}</td>
+                                        <td class="text-center">{{ number_format($grandPersen, 2, ',', '.') }}%</td>
+                                    </tr>
+                                @endif
+
                                 {{-- LEVEL 1: LOOP PROGRAM --}}
                                 @forelse($processedData as $p)
                                     <tr class="row-program">

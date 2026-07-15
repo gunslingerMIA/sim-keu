@@ -5,85 +5,108 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
-
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class LraExport implements FromCollection, WithStyles, WithColumnWidths
+class LraExport implements FromCollection, WithStyles, WithColumnWidths, WithHeadings, WithCustomStartCell
 {
     protected $processedData, $endDate, $jenisLra, $tahun, $grandTotal;
+
+    // Headings ada di baris 5 (startCell A5), data mulai baris 6
+    // rowTypes menyimpan tipe setiap baris data: ['skpd','program','kegiatan','sub_kegiatan','rekening','transaksi','total']
+    protected $rowTypes = [];
 
     public function __construct($processedData, $endDate, $jenisLra, $tahun, $grandTotal)
     {
         $this->processedData = $processedData;
-        $this->endDate = date('d/m/Y', strtotime($endDate));
-        $this->jenisLra = $jenisLra;
-        $this->tahun = $tahun;
-        $this->grandTotal = $grandTotal;
+        $this->endDate       = date('d/m/Y', strtotime($endDate));
+        $this->jenisLra      = $jenisLra;
+        $this->tahun         = $tahun;
+        $this->grandTotal    = $grandTotal;
     }
 
     public function collection()
     {
-        $data = collect();
+        $data       = collect();
+        $currentRow = 6; // baris 5 = heading, data mulai baris 6
+
+        // 0. LEVEL 0: SKPD / DINAS
+        if ($this->processedData->isNotEmpty()) {
+            $data->push([
+                'Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu',
+                '',
+                (float) $this->grandTotal['pagu'],
+                (float) $this->grandTotal['realisasi'],
+                (float) $this->grandTotal['sisa'],
+                (float) $this->grandTotal['persen'] / 100,
+            ]);
+            $this->rowTypes[$currentRow++] = 'skpd';
+        }
 
         // 1. Loop LEVEL 1: PROGRAM
         foreach ($this->processedData as $p) {
             $data->push([
                 $p->kode_program,
                 $p->nama_program,
-                $p->total_pagu,
-                $p->total_realisasi,
-                $p->total_sisa,
-                $p->total_persen / 100
+                (float) $p->total_pagu,
+                (float) $p->total_realisasi,
+                (float) $p->total_sisa,
+                (float) $p->total_persen / 100,
             ]);
+            $this->rowTypes[$currentRow++] = 'program';
 
             // 2. Loop LEVEL 2: KEGIATAN
             foreach ($p->activities as $act) {
                 $data->push([
                     $act->kode_kegiatan,
-                    "  " . $act->nama_kegiatan,
-                    $act->total_pagu,
-                    $act->total_realisasi,
-                    $act->total_sisa,
-                    $act->total_persen / 100
+                    $act->nama_kegiatan,
+                    (float) $act->total_pagu,
+                    (float) $act->total_realisasi,
+                    (float) $act->total_sisa,
+                    (float) $act->total_persen / 100,
                 ]);
+                $this->rowTypes[$currentRow++] = 'kegiatan';
 
                 // 3. Loop LEVEL 3: SUB-KEGIATAN
                 foreach ($act->subActivities as $sub) {
                     $data->push([
                         $sub->kode_sub_kegiatan,
-                        "    " . $sub->nama_sub_kegiatan,
-                        $sub->total_pagu,
-                        $sub->total_realisasi,
-                        $sub->total_sisa,
-                        $sub->total_persen / 100
+                        '  ' . $sub->nama_sub_kegiatan,
+                        (float) $sub->total_pagu,
+                        (float) $sub->total_realisasi,
+                        (float) $sub->total_sisa,
+                        (float) $sub->total_persen / 100,
                     ]);
+                    $this->rowTypes[$currentRow++] = 'sub_kegiatan';
 
                     // 4. Loop LEVEL 4: REKENING BELANJA
                     foreach ($sub->budgets as $b) {
                         $data->push([
                             $b->account->kode_rekening,
-                            "      " . $b->account->nama_rekening,
-                            $b->pagu_murni,
-                            $b->realisasi,
-                            $b->sisa,
-                            $b->persen / 100
+                            '    ' . $b->account->nama_rekening,
+                            (float) $b->pagu_murni,
+                            (float) $b->realisasi,
+                            (float) $b->sisa,
+                            (float) $b->persen / 100,
                         ]);
+                        $this->rowTypes[$currentRow++] = 'rekening';
 
                         // 5. Loop LEVEL 5: DETAIL TRANSAKSI (JIKA PILIH RINCI)
                         if ($this->jenisLra == 'rinci') {
                             foreach ($b->transactions as $t) {
                                 $data->push([
                                     date('d/m/Y', strtotime($t->tanggal)),
-                                    "        [" . $t->nobukti . "] - " . $t->keterangan,
-                                    0,
-                                    $t->jumlah,
-                                    0,
-                                    0
+                                    '      [' . $t->nobukti . '] - ' . $t->keterangan,
+                                    0.0,
+                                    (float) $t->jumlah,
+                                    0.0,
+                                    0.0,
                                 ]);
+                                $this->rowTypes[$currentRow++] = 'transaksi';
                             }
                         }
                     }
@@ -95,11 +118,12 @@ class LraExport implements FromCollection, WithStyles, WithColumnWidths
         $data->push([
             '',
             'TOTAL',
-            $this->grandTotal['pagu'],
-            $this->grandTotal['realisasi'],
-            $this->grandTotal['sisa'],
-            $this->grandTotal['persen'] / 100
+            (float) $this->grandTotal['pagu'],
+            (float) $this->grandTotal['realisasi'],
+            (float) $this->grandTotal['sisa'],
+            (float) $this->grandTotal['persen'] / 100,
         ]);
+        $this->rowTypes[$currentRow] = 'total';
 
         return $data;
     }
@@ -117,14 +141,14 @@ class LraExport implements FromCollection, WithStyles, WithColumnWidths
             'PAGU ANGGARAN',
             'REALISASI (DEBIT)',
             'SISA ANGGARAN',
-            '%'
+            '%',
         ];
     }
 
     public function columnWidths(): array
     {
         return [
-            'A' => 18,
+            'A' => 20,
             'B' => 60,
             'C' => 18,
             'D' => 18,
@@ -137,7 +161,11 @@ class LraExport implements FromCollection, WithStyles, WithColumnWidths
     {
         $highestRow = $sheet->getHighestRow();
 
-        // 1. TULIS KOP JUDUL LAPORAN MANUAL DI BARIS 1 - 3
+        // Aktifkan summary di atas group (tombol collapse muncul di atas children)
+        $sheet->setShowSummaryBelow(false);
+        $sheet->setShowSummaryRight(false);
+
+        // ── 1. KOP JUDUL (Baris 1-3) ─────────────────────────────────────────────
         $sheet->setCellValue('A1', 'LAPORAN REALISASI ANGGARAN BELANJA');
         $sheet->mergeCells('A1:F1');
         $sheet->getStyle('A1')->getFont()->setSize(14)->setBold(true);
@@ -153,65 +181,139 @@ class LraExport implements FromCollection, WithStyles, WithColumnWidths
         $sheet->getStyle('A3')->getFont()->setSize(10)->setItalic(true);
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Baris 4 dikosongkan untuk jarak/spacer antara KOP dan Tabel
+        // Baris 4 dikosongkan sebagai spacer
 
-        // 2. PENGUNCIAN WRAP TEXT & STYLING HEADER TABEL (BARIS 5)
+        // ── 2. HEADER TABEL (Baris 5) ─────────────────────────────────────────────
         $sheet->getRowDimension(5)->setRowHeight(30);
         $sheet->getStyle('A5:F5')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
         $sheet->getStyle('A5:F5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('2F4F4F');
-        $sheet->getStyle('A5:F5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet->getStyle('A5:F5')->getAlignment()->setWrapText(true);
+        $sheet->getStyle('A5:F5')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
 
-        // 3. LOOP UNTUK MEMBEDAKAN STYLE PROGRAM, KEGIATAN, SUB-KEGIATAN, & REKENING
+        // ── 3. LOOP STYLING PER BARIS ─────────────────────────────────────────────
         for ($row = 6; $row <= $highestRow; $row++) {
-            $kode = trim($sheet->getCell("A{$row}")->getValue());
-            $uraian = $sheet->getCell("B{$row}")->getValue();
+            $type = $this->rowTypes[$row] ?? 'unknown';
 
-            // Hitung jumlah titik untuk mendeteksi tingkatan kode rekening
-            $dotsCount = substr_count($kode, '.');
+            switch ($type) {
 
-            if ($kode === 'TOTAL') {
-                // BARIS GRAND TOTAL: Biru gelap, teks putih tebal
-                $sheet->getStyle("A{$row}:F{$row}")->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
-                $sheet->getStyle("A{$row}:F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('1A365D');
-                $sheet->getStyle("A{$row}:B{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            } elseif ($dotsCount === 2) {
-                // LEVEL 1: PROGRAM (Bold, Warna Biru Navy Tua, Background Abu-abu Sedang)
-                $sheet->getStyle("A{$row}:F{$row}")->getFont()->setBold(true)->getColor()->setRGB('002060');
-                $sheet->getStyle("A{$row}:F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D9E1F2');
-            } elseif ($dotsCount === 3) {
-                // LEVEL 2: KEGIATAN (Bold, Warna Hitam, Background Abu-abu Terang)
-                $sheet->getStyle("A{$row}:F{$row}")->getFont()->setBold(true);
-                $sheet->getStyle("A{$row}:F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F2F2F2');
-            } elseif ($dotsCount === 5) {
-                // LEVEL 3: SUB-KEGIATAN (Cetak Miring Lembut/Italic Bold, Tanpa Background)
-                $sheet->getStyle("A{$row}:F{$row}")->getFont()->setBold(true)->setItalic(true);
-            } elseif (str_starts_with(trim($uraian), '[')) {
-                // LEVEL 5: DETAIL TRANSAKSI LRA RINCI (Teks Kecil Abu, Background Kuning Gading)
-                $sheet->getStyle("A{$row}:F{$row}")->getFont()->setItalic(true)->setSize(9)->getColor()->setRGB('595959');
-                $sheet->getStyle("A{$row}:F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFDF0');
-            } else {
-                // LEVEL 4: REKENING BELANJA MURNI (Normal, Teks Biru Standar Keuangan)
-                // KODE YANG BENAR DAN AMAN
-                $sheet->getStyle("B{$row}")->getFont()->getColor()->setRGB('0070C0');
+                case 'skpd':
+                    // DINAS: background gelap tua, teks putih tebal
+                    $sheet->mergeCells("A{$row}:B{$row}");
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(true)->setItalic(false)->getColor()->setRGB('FFFFFF');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('2C3E50');
+                    $sheet->getStyle("A{$row}")
+                        ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                    $sheet->getRowDimension($row)->setOutlineLevel(0)->setCollapsed(false);
+                    break;
+
+                case 'program':
+                    // PROGRAM: background biru muda, teks navy tebal
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(true)->setItalic(false)->getColor()->setRGB('002060');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D9E1F2');
+                    $sheet->getRowDimension($row)->setOutlineLevel(1)->setCollapsed(false);
+                    break;
+
+                case 'kegiatan':
+                    // KEGIATAN: background abu-abu sedang, teks hitam tebal
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(true)->setItalic(false)->getColor()->setRGB('1F1F1F');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EDEDED');
+                    $sheet->getRowDimension($row)->setOutlineLevel(2)->setCollapsed(false);
+                    break;
+
+                case 'sub_kegiatan':
+                    // SUB-KEGIATAN: background putih, teks hitam tebal
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(true)->setItalic(false)->getColor()->setRGB('1F1F1F');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
+                    $sheet->getRowDimension($row)->setOutlineLevel(3)->setCollapsed(false);
+                    break;
+
+                case 'rekening':
+                    // REKENING BELANJA: italic, teks biru standar keuangan
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(false)->setItalic(true)->getColor()->setRGB('1F1F1F');
+                    $sheet->getStyle("B{$row}")
+                        ->getFont()->getColor()->setRGB('0070C0');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FAFAFA');
+                    $sheet->getRowDimension($row)->setOutlineLevel(4)->setCollapsed(false);
+                    break;
+
+                case 'transaksi':
+                    // DETAIL TRANSAKSI: font kecil abu, background kuning gading
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(false)->setItalic(true)->setSize(9)->getColor()->setRGB('595959');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFDF0');
+                    $sheet->getRowDimension($row)->setOutlineLevel(5)->setCollapsed(false);
+                    break;
+
+                case 'total':
+                    // GRAND TOTAL: background biru gelap, teks putih tebal
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFont()->setBold(true)->setItalic(false)->getColor()->setRGB('FFFFFF');
+                    $sheet->getStyle("A{$row}:F{$row}")
+                        ->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('1A365D');
+                    $sheet->getStyle("A{$row}:B{$row}")
+                        ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getRowDimension($row)->setOutlineLevel(0)->setCollapsed(false);
+                    break;
+
+                default:
+                    $sheet->getRowDimension($row)->setOutlineLevel(0)->setCollapsed(false);
+                    break;
             }
 
-            // Atur posisi teks vertikal agar selalu rapi di atas sel jika uraian wrap memanjang
-            $sheet->getStyle("A{$row}:F{$row}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+            // Teks vertikal selalu rapi di atas sel
+            $sheet->getStyle("A{$row}:F{$row}")
+                ->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
 
-            // Format nomor rupiah dan persentase untuk baris kuantitas
-            $sheet->getStyle("C{$row}:E{$row}")->getNumberFormat()->setFormatCode('"Rp "#,##0;[Red]("-Rp "#,##0");"Rp 0"');
-            $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('0.00%');
+            // Format angka: tanpa Rp, angka 0 tetap tampil 0 (bukan tanda hubung)
+            $sheet->getStyle("C{$row}:E{$row}")
+                ->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle("F{$row}")
+                ->getNumberFormat()->setFormatCode('0.00%');
+
+            // FIX: Maatwebsite Excel skip nilai PHP 0/0.0 saat menulis collection
+            // (karena empty(0) === true di PHP). Paksa tulis 0 ke sel yang kosong.
+            foreach (['C', 'D', 'E'] as $numCol) {
+                $cell = $sheet->getCell("{$numCol}{$row}");
+                if ($cell->getValue() === null || $cell->getValue() === '') {
+                    $cell->setValue(0);
+                }
+            }
+            // Kolom F (%) hanya diisi 0 jika bukan baris transaksi rinci
+            // (transaksi tidak punya persen, tapi 0 juga benar)
+            $fCell = $sheet->getCell("F{$row}");
+            if ($fCell->getValue() === null || $fCell->getValue() === '') {
+                $fCell->setValue(0);
+            }
         }
 
-        // 4. ATUR BORDER DAN ALIGNMENT KOLOM SECARA KESELURUHAN
-        $sheet->getStyle("A5:F{$highestRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        // ── 4. BORDER SELURUH TABEL ───────────────────────────────────────────────
+        $sheet->getStyle("A5:F{$highestRow}")
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // POIN PERBAIKAN: Kolom Kode Rekening (Kolom A) dipaksa rata kiri (LEFT) semua, bukan center
-        $sheet->getStyle("A6:A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        // Kolom A selalu rata kiri
+        $sheet->getStyle("A6:A{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        // Kolom khusus persen tetap di tengah agar seimbang
-        $sheet->getStyle("F6:F{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        // Kolom F (%) rata tengah
+        $sheet->getStyle("F6:F{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Kolom C, D, E (angka) rata kanan
+        $sheet->getStyle("C6:E{$highestRow}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
         return [];
     }

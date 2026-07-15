@@ -313,7 +313,13 @@ class ReportController extends Controller
         $jenisLra = $request->get('jenis_lra', 'ringkas');
 
         // Ambil raw data yang sama dari logic index LRA Abang sebelumnya
-        $programs = \App\Models\Program::where('tahun', $tahun)->with(['activities.subActivities.budgets.account'])->get();
+        $programs = \App\Models\Program::where('tahun', $tahun)
+            ->with([
+                'activities.subActivities.budgets' => function ($query) use ($tahun) {
+                    $query->where('tahun', $tahun)->with('account');
+                }
+            ])
+            ->get();
 
         // Jalankan mapping transform untuk menghitung realisasi & pagu (Gunakan logic penghitungan sum yang sama persis seperti lraIndex Abang)
         $processedData = $programs->map(function ($program) use ($endDate) {

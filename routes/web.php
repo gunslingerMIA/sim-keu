@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StagesController;
+use App\Http\Controllers\YearController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -52,6 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('stages')->group(function () {
         Route::post('/store', [StagesController::class, 'store'])->name('stages.store');
         Route::put('/set-active/{id}', [StagesController::class, 'setActive'])->name('stages.set-active');
+    });
+
+    Route::prefix('years')->group(function () {
+        Route::get('/', [YearController::class, 'index'])->name('years.index');
+        Route::post('/store', [YearController::class, 'store'])->name('years.store');
     });
 
     Route::prefix('transactions')->group(function (){

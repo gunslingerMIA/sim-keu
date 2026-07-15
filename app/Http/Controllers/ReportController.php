@@ -63,15 +63,16 @@ class ReportController extends Controller
                 ];
             });
 
-        $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
+        $nonBudgetData = \App\Models\Account::where('tahun', $tahun)
+            ->whereIn('kelompok', ['non sub-kegiatan'])
             ->get()
             ->map(function ($a) {
                 return [
-                    'id' => $a->id,
+                    'id'              => $a->id,
                     'sub_activity_id' => null,
-                    'kelompok' => 'Non-Belanja',
-                    'kode' => $a->kode_rekening,
-                    'display' => $a->nama_rekening
+                    'kelompok'        => 'Non-Belanja',
+                    'kode'            => $a->kode_rekening,
+                    'display'         => $a->nama_rekening
                 ];
             });
 
@@ -132,8 +133,8 @@ class ReportController extends Controller
                 ->get();
         }
 
-        // Ambil semua data master akun untuk fallback compact (jika dibutuhkan di view)
-        $accounts = \App\Models\Account::all();
+        // Ambil semua data master akun untuk tahun aktif (fallback compact)
+        $accounts = \App\Models\Account::where('tahun', $tahun)->get();
 
         return view('reports.ledger_index', compact(
             'accounts',

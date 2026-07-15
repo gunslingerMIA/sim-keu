@@ -38,16 +38,17 @@ class TransactionController extends Controller
                     'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
                 ];
             });
-        // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar)
-        $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
+        // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar) — filter per tahun
+        $nonBudgetData = \App\Models\Account::where('tahun', $tahun)
+            ->whereIn('kelompok', ['non sub-kegiatan'])
             ->get()
             ->map(function ($a) {
                 return [
-                    'id' => $a->id,
-                    'sub_activity_id' => null, // Non-belanja tidak ada sub-kegiatan
-                    'kelompok' => 'Non-Belanja',
-                    'kode' => $a->kode_rekening,
-                    'display' => $a->nama_rekening
+                    'id'              => $a->id,
+                    'sub_activity_id' => null,
+                    'kelompok'        => 'Non-Belanja',
+                    'kode'            => $a->kode_rekening,
+                    'display'         => $a->nama_rekening
                 ];
             });
 
@@ -77,16 +78,17 @@ class TransactionController extends Controller
                     'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
                 ];
             });
-        // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar)
-        $nonBudgetData = \App\Models\Account::whereIn('kelompok', ['non sub-kegiatan'])
+        // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar) — filter per tahun
+        $nonBudgetData = \App\Models\Account::where('tahun', $tahun)
+            ->whereIn('kelompok', ['non sub-kegiatan'])
             ->get()
             ->map(function ($a) {
                 return [
-                    'id' => $a->id,
-                    'sub_activity_id' => null, // Non-belanja tidak ada sub-kegiatan
-                    'kelompok' => 'Non-Belanja',
-                    'kode' => $a->kode_rekening,
-                    'display' => $a->nama_rekening
+                    'id'              => $a->id,
+                    'sub_activity_id' => null,
+                    'kelompok'        => 'Non-Belanja',
+                    'kode'            => $a->kode_rekening,
+                    'display'         => $a->nama_rekening
                 ];
             });
 

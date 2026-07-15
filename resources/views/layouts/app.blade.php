@@ -174,7 +174,7 @@
 
                 <div class="menu-header">Data Master</div>
 
-                <a href="#pengaturan" class="nav-link {{ request()->routeIs(['programs.*', 'budgets.*', 'accounts.*', 'users.*']) ? 'active' : '' }}" data-bs-toggle="collapse"><i class="bi bi-gear"></i>Setting Data</a>
+                <a href="#pengaturan" class="nav-link {{ request()->routeIs(['programs.*', 'budgets.*', 'accounts.*', 'users.*', 'years.*']) ? 'active' : '' }}" data-bs-toggle="collapse"><i class="bi bi-gear"></i>Setting Data</a>
                 <div class="collapse" id="pengaturan">
                     <a href="/programs" class="nav-link {{ request()->is('programs') ? 'active' : '' }}">
                         Program Kegiatan
@@ -187,6 +187,9 @@
                     </a>
                     <a href="/users" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
                       User
+                    </a>
+                    <a href="{{ route('years.index') }}" class="nav-link {{ request()->routeIs('years.*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-plus me-1 small"></i>Tahun Anggaran
                     </a>
                 </div>
 

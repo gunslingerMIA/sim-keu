@@ -34,8 +34,8 @@ class TransactionController extends Controller
                     'id' => $b->account_id,
                     'sub_activity_id' => $b->sub_activity_id,
                     'kelompok' => 'belanja',
-                    'kode' => $b->subActivity->kode_sub_kegiatan,
-                    'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
+                    'kode' => optional($b->subActivity)->kode_sub_kegiatan ?? '-',
+                    'display' => optional($b->subActivity)->nama_sub_kegiatan . " - " . optional($b->account)->nama_rekening
                 ];
             });
         // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar) — filter per tahun
@@ -53,8 +53,7 @@ class TransactionController extends Controller
             });
 
         // 3. Gabungkan keduanya
-        // $allOptions = $budgetData->concat($nonBudgetData);
-        $allOptions = $budgetData->merge($nonBudgetData); // Gunakan merge untuk menggabungkan koleksi
+        $allOptions = $budgetData->concat($nonBudgetData);
 
         return view('transactions.index', compact('transactions', 'tahun', 'allOptions', 'nonBudgetData'));
     }
@@ -74,8 +73,8 @@ class TransactionController extends Controller
                     'id' => $b->account_id,
                     'sub_activity_id' => $b->sub_activity_id,
                     'kelompok' => 'belanja',
-                    'kode' => $b->subActivity->kode_sub_kegiatan,
-                    'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
+                    'kode' => optional($b->subActivity)->kode_sub_kegiatan ?? '-',
+                    'display' => optional($b->subActivity)->nama_sub_kegiatan . " - " . optional($b->account)->nama_rekening
                 ];
             });
         // 2. Ambil Rekening Non-Belanja (Pajak, Kas, Panjar) — filter per tahun
@@ -93,8 +92,7 @@ class TransactionController extends Controller
             });
 
         // 3. Gabungkan keduanya
-        // $allOptions = $budgetData->concat($nonBudgetData);
-        $allOptions = $budgetData->merge($nonBudgetData); // Gunakan merge untuk menggabungkan koleksi
+        $allOptions = $budgetData->concat($nonBudgetData);
 
         // dd($allOptions->all());
 

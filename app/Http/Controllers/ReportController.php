@@ -58,8 +58,8 @@ class ReportController extends Controller
                     'id' => $b->account_id,
                     'sub_activity_id' => $b->sub_activity_id,
                     'kelompok' => 'belanja',
-                    'kode' => $b->subActivity->kode_sub_kegiatan,
-                    'display' => $b->subActivity->nama_sub_kegiatan . " - " . $b->account->nama_rekening
+                    'kode' => optional($b->subActivity)->kode_sub_kegiatan ?? '-',
+                    'display' => optional($b->subActivity)->nama_sub_kegiatan . " - " . optional($b->account)->nama_rekening
                 ];
             });
 
@@ -76,7 +76,7 @@ class ReportController extends Controller
                 ];
             });
 
-        $allOptions = $budgetData->merge($nonBudgetData);
+        $allOptions = $budgetData->concat($nonBudgetData);
 
         // 2. Tangkap Request Filter
         $selectedAccount = $request->get('account_id');
